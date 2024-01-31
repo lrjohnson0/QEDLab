@@ -2,7 +2,7 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "QEDLab",
+    "title": "QED Lab @ VT",
     "section": "",
     "text": "We are a statistical and quantitative biology lab working at the intersection of statistics, biology, and mathematics. At a broad level, our research focuses on understanding how differences between individuals in a population result from external heterogeneity and stochasticity, and how this variability influences population level patterns.\nWe address these questions primarily in the context of infectious disease epidemiology, as well as in behavioral and population ecology. Our approach is to use theoretical models to understand how systems behave generally, while simultaneously seeking to confront and validate models with data and make predictions. Thus, a significant portion of our research focuses on methods for statistical — particularly Bayesian — inference and validation for mechanistic mathematical models of biological systems.\nResearch questions in the QED lab fall into three complementary areas:\n\nThe ecology of infectious diseases\nThe evolution of individual behaviors or life history strategies and the implication of individual traits on population dynamics and persistence\nInference methods (primarily Bayesian) for mechanistic models of biological systems"
   },

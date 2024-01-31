@@ -1,18 +1,47 @@
 project:
   type: website
+  output-dir: "_site"
 
 website:
-  title: "QEDLab"
+  title: "QED Lab @ VT"
+  description: "Quantitative Ecological Dynamics @ Virginia Tech"
+
   navbar:
-    left:
-      - href: index.qmd
-        text: Home
-      - about.qmd
+    background: dark
+    right:
+      - text: "Home"
+        href: index.html
+      - text: "People"
+        menu:
+          - text: "PI: Dr. LR Johnson"
+            href: leah.html
+          - text: "Current Members"
+            href: people_current.html
+          - text: "Lab Alumni"
+            href: people_alumni.html
+      - text: "Research"
+        menu:
+          - text: "Research Areas"
+            href: research.html
+          - text: "VectorBiTE RCN and VectorByte"
+            href: VB.html
+      - text: "Publications"
+        href: publications.html
+      - text: "News"
+        href: news.html
+      - text: "Opportunities"
+        href: opps.html
+      - icon: fa fa-twitter
+        href: https://twitter.com/QEDlab
+    search: true
+
+
+
 
 format:
   html:
-    theme: cosmo
-    css: styles.css
+    theme:
+      - united
     toc: true
 
 editor: visual
