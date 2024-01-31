@@ -2,7 +2,7 @@
 title: "Joe Harrison"
 about:
   template: jolla
-  image: tux.png
+  image: images/tux.png
   links:
     - icon: github
       text: Github
