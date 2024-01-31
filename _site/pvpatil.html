@@ -7,8 +7,165 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>QED Lab @ VT - About</title>
+<title>QED Lab @ VT - Parul Patil</title>
 <style>
+html {
+  color: #1a1a1a;
+  background-color: #fdfdfd;
+}
+body {
+  margin: 0 auto;
+  max-width: 36em;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
+}
+@media (max-width: 600px) {
+  body {
+    font-size: 0.9em;
+    padding: 12px;
+  }
+  h1 {
+    font-size: 1.8em;
+  }
+}
+@media print {
+  html {
+    background-color: white;
+  }
+  body {
+    background-color: transparent;
+    color: black;
+    font-size: 12pt;
+  }
+  p, h2, h3 {
+    orphans: 3;
+    widows: 3;
+  }
+  h2, h3, h4 {
+    page-break-after: avoid;
+  }
+}
+p {
+  margin: 1em 0;
+}
+a {
+  color: #1a1a1a;
+}
+a:visited {
+  color: #1a1a1a;
+}
+img {
+  max-width: 100%;
+}
+svg {
+  height; auto;
+  max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.4em;
+}
+h5, h6 {
+  font-size: 1em;
+  font-style: italic;
+}
+h6 {
+  font-weight: normal;
+}
+ol, ul {
+  padding-left: 1.7em;
+  margin-top: 1em;
+}
+li > ol, li > ul {
+  margin-top: 0;
+}
+ul > li:not(:has(> p)) > ul,
+ol > li:not(:has(> p)) > ul,
+ul > li:not(:has(> p)) > ol,
+ol > li:not(:has(> p)) > ol {
+  margin-bottom: 0;
+}
+ul > li:not(:has(> p)) > ul > li:has(> p),
+ol > li:not(:has(> p)) > ul > li:has(> p),
+ul > li:not(:has(> p)) > ol > li:has(> p),
+ol > li:not(:has(> p)) > ol > li:has(> p) {
+  margin-top: 1rem;
+}
+blockquote {
+  margin: 1em 0 1em 1.7em;
+  padding-left: 1em;
+  border-left: 2px solid #e6e6e6;
+  color: #606060;
+}
+code {
+  font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+  font-size: 85%;
+  margin: 0;
+  hyphens: manual;
+}
+pre {
+  margin: 1em 0;
+  overflow: auto;
+}
+pre code {
+  padding: 0;
+  overflow: visible;
+  overflow-wrap: normal;
+}
+.sourceCode {
+ background-color: transparent;
+ overflow: visible;
+}
+hr {
+  background-color: #1a1a1a;
+  border: none;
+  height: 1px;
+  margin: 1em 0;
+}
+table {
+  margin: 1em 0;
+  border-collapse: collapse;
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+  margin-bottom: 0.75em;
+}
+tbody {
+  margin-top: 0.5em;
+  border-top: 1px solid #1a1a1a;
+  border-bottom: 1px solid #1a1a1a;
+}
+th {
+  border-top: 1px solid #1a1a1a;
+  padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+  padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+  margin-bottom: 4em;
+  text-align: center;
+}
+#TOC li {
+  list-style: none;
+}
+#TOC ul {
+  padding-left: 1.3em;
+}
+#TOC > ul {
+  padding-left: 0;
+}
+#TOC a:not(:hover) {
+  text-decoration: none;
+}
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -19,40 +176,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -67,7 +190,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
@@ -188,41 +310,40 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+  <ul>
+  <li><a href="#education" id="toc-education" class="nav-link active" data-scroll-target="#education">Education</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
+<div class="quarto-about-trestles content">
+  <div class="about-entity">
+    <img src="images/pvp.jpg" class="about-image
+  rounded " style="width: 20em;">
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">About</h1>
+<h1 class="title">Parul Patil</h1>
 </div>
-
-
-
 <div class="quarto-title-meta">
-
-    
-  
-    
   </div>
-  
-
-
 </header>
+  </div>
+  <div class="about-contents"><main class="content" id="quarto-document-content">
+
+<p>I am a Third Year PhD Student in the department of Statistics at Virginia Tech. My research interest is in the field of Gaussian Processes. Currently I am working on forecasting Tick Populations using a Gaussian Process model.</p>
+<section id="education" class="level2">
+<h2 data-anchor-id="education">Education</h2>
+<p>Virginia Tech | Blacksburg, Virginia PhD. in Statistics | Aug 2021 - May 2026 (anticipated)</p>
+<p>University of Mumbai| Mumbai, India MSc. in Statistics | Aug 2018 - Oct 2020</p>
+<p>Ramnarain Ruia Autonomous College | Mumbai, India BSc. in Statistics | Aug 2015 - May 2018</p>
 
 
-<p>About this site</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
+</section>
+</main></div>
 </div>
-</div>
-
-
-
-</main> <!-- /main -->
+ <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -243,13 +364,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
   toggleBodyColorPrimary();  
-  const icon = "";
-  const anchorJS = new window.AnchorJS();
-  anchorJS.options = {
-    placement: 'right',
-    icon: icon
-  };
-  anchorJS.add('.anchored');
   const isCodeAnnotation = (el) => {
     for (const clz of el.classList) {
       if (clz.startsWith('code-annotation-')) {                     
