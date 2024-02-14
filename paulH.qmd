@@ -1,0 +1,41 @@
+---
+title: "Dr. Paul Huxley"
+about: 
+  template: jolla
+  image: images/paul.JPG
+  links:
+    - icon: google
+      text: Google Scholar
+      url: "https://scholar.google.com/citations?hl=en&user=dgF3cwcAAAAJ"
+    - icon: card-text
+      text: CV
+      url: "paulhuxleyCV.pdf"
+    - icon: twitter
+      text: Twitter
+      url: "https://twitter.com/pjonohuxley"
+    - icon: email
+      text: Email
+      url: "mailto:phuxley@vt.edu"
+document-css: true
+---
+ 
+## Bio
+
+I am a Postdoctoral Researcher in the Department of Statistics at Virginia Tech. I am interested in ecology across scales - understanding how current patterns of biodiversity reflect environmental conditions as well as historical patterns of evolution. I am particularly interested in ecological responses to changing environments - from life history responses through to population and community dynamics. Currently, I use statistical and mathematical models to better understand and predict patterns of covariation between life history traits in disease vectors and other arthropods.
+
+<br>
+
+## Education
+
+**Imperial College London** | London, UK
+
+Ph.D. in Disease Vector Biology and Ecology | 2021
+
+**University of Edinburgh** | Edinburgh, UK
+
+MSc in Biodiversity, Wildlife and Ecosystem Health | 2015
+
+<br>
+
+
+

@@ -1,1 +1,1 @@
-whooooo
+Dr. Johnson's QED Lab website. Built using quarto

@@ -14,7 +14,7 @@ website:
       - text: "People"
         menu:
           - text: "PI: Dr. LR Johnson"
-            href: leah.html
+            href: leahJ.html
           - text: "Current Members"
             href: people_current.html
           - text: "Lab Alumni"

@@ -1,0 +1,22 @@
+---
+title: "Parul Patil"
+about:
+  template: jolla
+  image: 'images/pvp.jpg'
+document-css: true
+---
+
+I am a Third Year PhD Student in the department of Statistics at Virginia Tech. My research interest is in the field of Gaussian Processes. Currently I am working on forecasting Tick Populations using a Gaussian Process model.   
+
+## Education
+
+Virginia Tech | Blacksburg, Virginia
+PhD. in Statistics | Aug 2021 - May 2026 (anticipated)
+
+University of Mumbai| Mumbai, India
+MSc. in Statistics | Aug 2018 - Oct 2020
+
+Ramnarain Ruia Autonomous College | Mumbai, India
+BSc. in Statistics | Aug 2015 - May 2018
+
+

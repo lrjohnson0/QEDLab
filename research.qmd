@@ -1,0 +1,26 @@
+---
+title: "Research"
+description: Current research projects in the QED Lab.
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Vector-Borne Disease and Temperature
+
+Vector-borne diseases (VBDs) are major sources of illness and mortality in humans, especially in developing countries, as well as in plants and animals. The dynamics of many VDBs such as malaria, dengue, Zika, and huanglongbing, are greatly influenced by extrinsic environmental factors, such as temperature. As climate changes over time the distribution of both epidemic and endemic VBDs will likely change, presenting new challenges for control. Thus, a better understanding of how the dynamics of VBDs depend on environmental factors such as temperature will be vital for understanding when and where VBDs will spread.
+
+
+## Bayesian inference for ecological models
+
+Differential equations (DEs) are commonly used to model the temporal evolution of biological systems, but statistical methods for comparing DE models to data and for parameter inference are relatively poorly developed. This is especially problematic in the context of biological systems where observations are often noisy and only a small number of time points may be available.
+
+Bayesian approaches offer a coherent framework for parameter inference that can account for multiple sources of uncertainty, while making use of prior information. We have developed deBInfer, an R package implementing a Bayesian framework for parameter inference in DEs. This approach offers a rigorous methodology for parameter inference as well as modeling the link between unobservable model states and parameters, and observable quantities.
+
+deBInfer is freely available on CRAN!
+
+Related publications
+
+Boersch‐Supan, P.H., Ryan, S.J. and Johnson, L.R., 2017. deBInfer: Bayesian inference for dynamical models of biological systems in R. Methods in Ecology and Evolution, 8(4), pp.511-518.
+

@@ -17,7 +17,7 @@ cleanbib()
 options("citation_format" = "pandoc", 
         "cite.style" = "authoryear", 
         "max.names" = 10)
-read.bibtex(file = "pubs2024.bib")
+read.bibtex(file = "publications/pubs2024.bib")
 ```
 
 ------------------------------------------------------------------------
@@ -30,7 +30,7 @@ cleanbib()
 options("citation_format" = "pandoc", 
         "cite.style" = "authoryear", 
         "max.names" = 10)
-read.bibtex(file = "pubs2023.bib")
+read.bibtex(file = "publications/pubs2023.bib")
 ```
 
 ------------------------------------------------------------------------
@@ -43,7 +43,7 @@ cleanbib()
 options("citation_format" = "pandoc", 
         "cite.style" = "authoryear", 
         "max.names" = 10)
-read.bibtex(file = "pubs2022.bib")
+read.bibtex(file = "publications/pubs2022.bib")
 ```
 
 ------------------------------------------------------------------------
@@ -56,7 +56,7 @@ cleanbib()
 options("citation_format" = "pandoc", 
         "cite.style" = "authoryear", 
         "max.names" = 10)
-read.bibtex(file = "pubs2021.bib")
+read.bibtex(file = "publications/pubs2021.bib")
 ```
 
 ------------------------------------------------------------------------
@@ -68,7 +68,7 @@ require("knitcitations")
 cleanbib()
 options("citation_format" = "pandoc", "cite.style" = "authoryear",
         "max.names" = 10)
-read.bibtex(file = "pubs2020.bib")
+read.bibtex(file = "publications/pubs2020.bib")
 ```
 
 ------------------------------------------------------------------------
@@ -79,7 +79,7 @@ read.bibtex(file = "pubs2020.bib")
 require("knitcitations")
 cleanbib()
 options("citation_format" = "pandoc")
-read.bibtex(file = "pubs2019.bib")
+read.bibtex(file = "publications/pubs2019.bib")
 ```
 
 ------------------------------------------------------------------------
@@ -90,7 +90,7 @@ read.bibtex(file = "pubs2019.bib")
 require("knitcitations")
 cleanbib()
 options("citation_format" = "pandoc")
-read.bibtex(file = "pubs2018.bib")
+read.bibtex(file = "publications/pubs2018.bib")
 ```
 
 ------------------------------------------------------------------------
@@ -101,7 +101,7 @@ read.bibtex(file = "pubs2018.bib")
 require("knitcitations")
 cleanbib()
 options("citation_format" = "pandoc")
-read.bibtex(file = "pubs2017.bib")
+read.bibtex(file = "publications/pubs2017.bib")
 ```
 
 ------------------------------------------------------------------------
@@ -112,7 +112,7 @@ read.bibtex(file = "pubs2017.bib")
 require("knitcitations")
 cleanbib()
 options("citation_format" = "pandoc")
-read.bibtex(file = "pubs2016.bib")
+read.bibtex(file = "publications/pubs2016.bib")
 ```
 
 ------------------------------------------------------------------------
@@ -123,7 +123,7 @@ read.bibtex(file = "pubs2016.bib")
 require("knitcitations")
 cleanbib()
 options("citation_format" = "pandoc")
-read.bibtex(file = "pubs_2013_2015.bib")
+read.bibtex(file = "publications/pubs_2013_2015.bib")
 ```
 
 ------------------------------------------------------------------------
@@ -134,7 +134,7 @@ read.bibtex(file = "pubs_2013_2015.bib")
 require("knitcitations")
 cleanbib()
 options("citation_format" = "pandoc", "sorting" = "ynt")
-read.bibtex(file = "pubs_pre2013.bib")
+read.bibtex(file = "publications/pubs_pre2013.bib")
 ```
 
 ------------------------------------------------------------------------
@@ -145,7 +145,7 @@ read.bibtex(file = "pubs_pre2013.bib")
 require("knitcitations")
 cleanbib()
 options("citation_format" = "pandoc")
-read.bibtex(file = "pubs_preprints.bib")
+read.bibtex(file = "publications/pubs_preprints.bib")
 ```
 
 ------------------------------------------------------------------------

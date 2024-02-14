@@ -1,0 +1,25 @@
+---
+title: "Joe Harrison"
+about:
+  template: jolla
+  image: images/tux.png
+  links:
+    - icon: github
+      text: Github
+      href: https://github.com/mkw-TL
+    - icon: website
+      text: Website
+      href: https://joeh.netlify.com
+    - icon: card-list
+      text: CV
+      href: https://joeh.netlify.app/cv/Harrison_CV.pdf
+document-css: true
+---
+
+Joe is a senior in Statistics and Computational Modeling & Data Analytics. 
+He currently plans on attending NC State in the Spring as a PhD student, under the direction of Dr. Ryan Martin, 
+investigating the intersection of Frequentist and Bayesian Methodologies. 
+
+In the lab, Joe helps with the data collection process and uses his Bayesian knowledge
+in order to fit TPCs. 
+Outside the lab, Joe enjoys playing chess, singing within choir, and browsing R packages. 
