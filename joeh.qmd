@@ -10,6 +10,9 @@ about:
     - icon: website
       text: Website
       href: https://joeh.netlify.com
+    - icon: card-list
+      text: CV
+      href: https://joeh.netlify.app/cv/Harrison_CV.pdf
 document-css: true
 ---
 
