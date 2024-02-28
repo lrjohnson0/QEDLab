@@ -1,7 +1,10 @@
 project:
   type: website
   output-dir: "_site"
-
+resources: 
+  - lrjohnsonCV.pdf
+  - paul-cv.pdf
+  - STS822.pdf
 website:
   title: "QED Lab @ VT"
   description: "Quantitative Ecological Dynamics @ Virginia Tech"
