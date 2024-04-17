@@ -43,6 +43,7 @@ website:
 
 format:
   html:
+    page-layout: full
     theme:
       - united
     toc: true
