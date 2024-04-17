@@ -9,18 +9,53 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Vector-Borne Disease and Temperature
 
-Vector-borne diseases (VBDs) are major sources of illness and mortality in humans, especially in developing countries, as well as in plants and animals. The dynamics of many VDBs such as malaria, dengue, Zika, and huanglongbing, are greatly influenced by extrinsic environmental factors, such as temperature. As climate changes over time the distribution of both epidemic and endemic VBDs will likely change, presenting new challenges for control. Thus, a better understanding of how the dynamics of VBDs depend on environmental factors such as temperature will be vital for understanding when and where VBDs will spread.
+Vector-borne diseases (VBDs) are major sources of illness and mortality in humans, especially in developing countries, as well as in plants and animals. The dynamics of many VDBs such as malaria, dengue, Zika, and huanglongbing, are greatly influenced by extrinsic environmental factors, such as temperature. As climate changes over time the distribution of both epidemic and endemic VBDs will likely change, presenting new challenges for control. Thus, a better understanding of how the dynamics of VBDs depend on environmental factors such as temperature will be vital for understanding when and where VBDs will spread. 
+
+### Recent Papers
+
+key: * - postdoctoral advisee; $\dagger$ - graduate student advisee (including committees); ug - undergraduate advisee
+
+
+- Dennington, N.L., M.K. Grossman, F. Ware-Gilmore, J.L. Teeple, **L.R. Johnson**, M.S. Shocket, E.A. McGraw, and M.B. Thomas. "Phenotypic adaptation to temperature in the mosquito vector, *Aedes aegypti*". *Global Change Biology*, vol. 30, no. 1, 2024, e17041.
+- Pawar, S., P.J. Huxley$^*$, T.R. Smallwood, M.L. Nesbit, A.H. Chan, M.S. Shocket, **L.R. Johnson**, D.-G. Kontopoulos, and L. Cator. "Variation in temperature of peak trait performance constrains adaptation of arthropod populations to climatic warming". *Nature Ecology and Evolution*, 2024, online early. https://doi.org/10.1038/s41559-023-02301-8.
+- Brown, J.J., M. Pascual, M.C. Wimberly, **L.R. Johnson**, and C.C. Murdock. "Humidity – The overlooked variable in the thermal biology of mosquito-borne disease". Ecology Letters, 2023. https://doi.org/10.1111/ele.14228.
+
+
+### Current Grants
+
+- *Collaborative Research: MRA: Using NEON data to elucidate the ecological effects of global environmental change on phenology across time and space*.  NSF DEB #2017463. 
+
+- *Collaborative Research: CIBR: VectorByte: A Global Informatics Platform for studying the Ecology of Vector-Borne Diseases*.  NSF DBI #2016264. 
+
+- *CAREER: Quantifying heterogeneity and uncertainty in the transmission of vector borne dis- eases with a Bayesian trait-based framework*. NSF DMS/DEB #1750113
+
 
 
 ## Bayesian inference for ecological models
 
-Differential equations (DEs) are commonly used to model the temporal evolution of biological systems, but statistical methods for comparing DE models to data and for parameter inference are relatively poorly developed. This is especially problematic in the context of biological systems where observations are often noisy and only a small number of time points may be available.
+Ecological models come in many flavors from relatively simple response functions (such as thermal performance curves) to differential equations and state-space models. Bayesian approaches offer a coherent framework for parameter inference that can account for multiple sources of uncertainty, while making use of prior information. In our lab we use Bayesian approaches to fit models of varying complexity to better understand biological processes. We often develop software packages (primarily in R) to support the adoption of these methods by other scientists.
 
-Bayesian approaches offer a coherent framework for parameter inference that can account for multiple sources of uncertainty, while making use of prior information. We have developed deBInfer, an R package implementing a Bayesian framework for parameter inference in DEs. This approach offers a rigorous methodology for parameter inference as well as modeling the link between unobservable model states and parameters, and observable quantities.
+### Recent Papers
 
-deBInfer is freely available on CRAN!
+- Smith$^\dagger$, J.W., R.Q. Thomas, and **L.R. Johnson**. "Parameterizing Lognormal state space models using moment matching". *Environmental and Ecological Statistics*, vol. 30, no. 3, 2023, pp. 385–419.
+- Smith Jr$^\dagger$, J.W., **L.R. Johnson**, and R.Q. Thomas. "Assessing ecosystem state space models: Identifiability and estimation". *Journal of Agricultural, Biological and Environmental Statistics*, 2023, pp. 1–24.
+- Zhang, B., R.B. Gramacy, **L.R. Johnson**, K.A. Rose, and E. Smith. "Batch-sequential design and heteroskedastic surrogate modeling for delta smelt conservation". *The Annals of Applied Statistics*, vol. 16, no. 2, 2022, pp. 816–42.
+- Gajewski$^\dagger$, Z., L.A. Stevenson, D.A. Pike, E.A. Roznik, R.A. Alford, and **L.R. Johnson**. "Predicting the growth of the amphibian chytrid fungus in varying temperature environments". *Ecology and Evolution*, vol. 11, no. 24, 2021, pp. 17920–31.
 
-Related publications
 
-Boersch‐Supan, P.H., Ryan, S.J. and Johnson, L.R., 2017. deBInfer: Bayesian inference for dynamical models of biological systems in R. Methods in Ecology and Evolution, 8(4), pp.511-518.
+### Current Grants
+
+- *CAREER: Quantifying heterogeneity and uncertainty in the transmission of vector borne dis- eases with a Bayesian trait-based framework*. NSF DMS/DEB #1750113
+
+
+## Packages
+
+### Bayesian Inference for Differential Equations
+
+Differential equations (DEs) are commonly used to model the temporal evolution of biological systems, but statistical methods for comparing DE models to data and for parameter inference are relatively poorly developed. This is especially problematic in the context of biological systems where observations are often noisy and only a small number of time points may be available. We have developed deBInfer, an R package implementing a Bayesian framework for parameter inference in DEs. This approach offers a rigorous methodology for parameter inference as well as modeling the link between unobservable model states and parameters, and observable quantities.
+
+
+- [Boersch‐Supan, P.H., Ryan, S.J. and Johnson, L.R., 2017. "deBInfer: Bayesian inference for dynamical models of biological systems in R". *Methods in Ecology and Evolution*, 8(4), pp.511-518.](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12679){.external target="_blank"}
+- [**deBInfer** package on CRAN](https://cran.r-project.org/web/packages/deBInfer/index.html){.external target="_blank"}
+
 
