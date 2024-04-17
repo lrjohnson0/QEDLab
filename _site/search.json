@@ -242,14 +242,14 @@
     "href": "seanS.html",
     "title": "Sean Sorek",
     "section": "",
-    "text": "Sean is a senior in Statistics and Mathematics at Virginia Tech. He plans to attend Columbia University this fall for a M.S in Biostatistics. His research interest is in disease forecasting using Bayesian methods.\nIn the lab, Sean is actively developing bayesTPC, an interface to easily fit Bayesian thermal performance curves in R. Outside of school, he enjoys rock climbing, listening to and making music, and playing chess.\n\n\nColumbia University | New York, NY | M.S in Biostatistics | 2024-2026\nVirginia Tech | Blacksburg, VA | B.S in Statistics and B.S in Mathematics | 2020-2024\n\n\n\nbayesTPC | Developer and Maintainer."
+    "text": "Sean is a senior in Statistics and Mathematics at Virginia Tech. He plans to attend Columbia University this fall for a M.S in Biostatistics. His research interest is in disease forecasting using Bayesian methods.\nIn the lab, Sean is actively developing bayesTPC, an interface to easily fit Bayesian thermal performance curves in R. Outside of school, he enjoys rock climbing, listening to and making music, and playing chess."
   },
   {
     "objectID": "seanS.html#education",
     "href": "seanS.html#education",
     "title": "Sean Sorek",
-    "section": "",
-    "text": "Columbia University | New York, NY | M.S in Biostatistics | 2024-2026\nVirginia Tech | Blacksburg, VA | B.S in Statistics and B.S in Mathematics | 2020-2024"
+    "section": "Education",
+    "text": "Education\nColumbia University | New York, NY | M.S in Biostatistics | 2024-2026\nVirginia Tech | Blacksburg, VA | B.S in Statistics and B.S in Mathematics | 2020-2024"
   },
   {
     "objectID": "seanS.html#major-projects",
@@ -262,7 +262,7 @@
     "objectID": "seanS.html#projects",
     "href": "seanS.html#projects",
     "title": "Sean Sorek",
-    "section": "",
-    "text": "bayesTPC | Developer and Maintainer."
+    "section": "Projects",
+    "text": "Projects\nbayesTPC | Developer and Maintainer."
   }
 ]

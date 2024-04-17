@@ -1,7 +1,7 @@
 ---
 title: "Sean Sorek"
 about:
-  template: jolla
+  template: trestles
   image: images/sean_headshot.jpg
   links:
   - icon: github
@@ -13,7 +13,7 @@ about:
 document-css: true
 ---
 
-::: {#hero-heading}
+
 
 Sean is a senior in Statistics and Mathematics at Virginia Tech. He plans to attend Columbia University this fall for a M.S in Biostatistics. His research interest is in disease forecasting using Bayesian methods.
 
@@ -31,4 +31,3 @@ Virginia Tech \| Blacksburg, VA \| B.S in Statistics and B.S in Mathematics \| 2
 
 **[bayesTPC](https://github.com/johnwilliamsmithjr/bayesTPC)** | Developer and Maintainer.
 
-:::
