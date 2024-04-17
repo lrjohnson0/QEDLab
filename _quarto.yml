@@ -46,6 +46,7 @@ format:
     page-layout: full
     theme:
       - united
+      - custom.scss
     toc: true
 
 editor: visual

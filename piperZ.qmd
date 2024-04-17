@@ -1,16 +1,21 @@
 ---
 title: "Piper Zimmerman"
+format:
+  html:
+    toc: false
 about:
-  template: jolla
+  template: trestles
   image: images/Headshot_DSPG.JPG
 document-css: true
 ---
 
 ::: {#hero-heading}
+
+## Bio 
+
 Piper is a 3rd year PhD candidate in the statistics department at Virginia Tech. With her advisor, Leah Johnson, she works on modeling lifetime and mortality of insects.
 
 Outside of academics, she enjoys running, juicing, and walking her dog.
-
 
 ## Education
 

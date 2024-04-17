@@ -21,6 +21,13 @@
     "text": "Sean is a senior in Statistics and Mathematics at Virginia Tech. He plans to attend Columbia University this fall for a M.S in Biostatistics. His research interest is in disease forecasting using Bayesian methods.\nIn the lab, Sean is actively developing bayesTPC, an interface to easily fit Bayesian thermal performance curves in R. Outside of school, he enjoys rock climbing, listening to and making music, and playing chess."
   },
   {
+    "objectID": "seanS.html#bio",
+    "href": "seanS.html#bio",
+    "title": "Sean Sorek",
+    "section": "",
+    "text": "Sean is a senior in Statistics and Mathematics at Virginia Tech. He plans to attend Columbia University this fall for a M.S in Biostatistics. His research interest is in disease forecasting using Bayesian methods.\nIn the lab, Sean is actively developing bayesTPC, an interface to easily fit Bayesian thermal performance curves in R. Outside of school, he enjoys rock climbing, listening to and making music, and playing chess."
+  },
+  {
     "objectID": "seanS.html#education",
     "href": "seanS.html#education",
     "title": "Sean Sorek",
@@ -53,7 +60,7 @@
     "href": "piperZ.html",
     "title": "Piper Zimmerman",
     "section": "",
-    "text": "Piper is a 3rd year PhD candidate in the statistics department at Virginia Tech. With her advisor, Leah Johnson, she works on modeling lifetime and mortality of insects.\nOutside of academics, she enjoys running, juicing, and walking her dog.\n\n\nVirginia Tech | Blacksburg, VA | PhD Candidate in Statistics | 2021-Present\nRochester Institute of Technology | Rochester, NY | M.S in Applied Statistics | 2017-2021\nRochester Institute of Technology | Rochester, NY | B.S in Applied Statistics and Actuarial Science | 2017-2021"
+    "text": "Piper is a 3rd year PhD candidate in the statistics department at Virginia Tech. With her advisor, Leah Johnson, she works on modeling lifetime and mortality of insects.\nOutside of academics, she enjoys running, juicing, and walking her dog.\n\n\n\nVirginia Tech | Blacksburg, VA | PhD Candidate in Statistics | 2021-Present\nRochester Institute of Technology | Rochester, NY | M.S in Applied Statistics | 2017-2021\nRochester Institute of Technology | Rochester, NY | B.S in Applied Statistics and Actuarial Science | 2017-2021"
   },
   {
     "objectID": "piperZ.html#education",
@@ -214,21 +221,28 @@
     "href": "research.html",
     "title": "Research",
     "section": "",
-    "text": "Vector-borne diseases (VBDs) are major sources of illness and mortality in humans, especially in developing countries, as well as in plants and animals. The dynamics of many VDBs such as malaria, dengue, Zika, and huanglongbing, are greatly influenced by extrinsic environmental factors, such as temperature. As climate changes over time the distribution of both epidemic and endemic VBDs will likely change, presenting new challenges for control. Thus, a better understanding of how the dynamics of VBDs depend on environmental factors such as temperature will be vital for understanding when and where VBDs will spread."
+    "text": "Vector-borne diseases (VBDs) are major sources of illness and mortality in humans, especially in developing countries, as well as in plants and animals. The dynamics of many VDBs such as malaria, dengue, Zika, and huanglongbing, are greatly influenced by extrinsic environmental factors, such as temperature. As climate changes over time the distribution of both epidemic and endemic VBDs will likely change, presenting new challenges for control. Thus, a better understanding of how the dynamics of VBDs depend on environmental factors such as temperature will be vital for understanding when and where VBDs will spread.\n\n\nkey: * - postdoctoral advisee; \\(\\dagger\\) - graduate student advisee (including committees); ug - undergraduate advisee\n\nDennington, N.L., M.K. Grossman, F. Ware-Gilmore, J.L. Teeple, L.R. Johnson, M.S. Shocket, E.A. McGraw, and M.B. Thomas. “Phenotypic adaptation to temperature in the mosquito vector, Aedes aegypti”. Global Change Biology, vol. 30, no. 1, 2024, e17041.\nPawar, S., P.J. Huxley\\(^*\\), T.R. Smallwood, M.L. Nesbit, A.H. Chan, M.S. Shocket, L.R. Johnson, D.-G. Kontopoulos, and L. Cator. “Variation in temperature of peak trait performance constrains adaptation of arthropod populations to climatic warming”. Nature Ecology and Evolution, 2024, online early. https://doi.org/10.1038/s41559-023-02301-8.\nBrown, J.J., M. Pascual, M.C. Wimberly, L.R. Johnson, and C.C. Murdock. “Humidity – The overlooked variable in the thermal biology of mosquito-borne disease”. Ecology Letters, 2023. https://doi.org/10.1111/ele.14228.\n\n\n\n\n\nCollaborative Research: MRA: Using NEON data to elucidate the ecological effects of global environmental change on phenology across time and space. NSF DEB #2017463.\nCollaborative Research: CIBR: VectorByte: A Global Informatics Platform for studying the Ecology of Vector-Borne Diseases. NSF DBI #2016264.\nCAREER: Quantifying heterogeneity and uncertainty in the transmission of vector borne dis- eases with a Bayesian trait-based framework. NSF DMS/DEB #1750113"
   },
   {
     "objectID": "research.html#vector-borne-disease-and-temperature",
     "href": "research.html#vector-borne-disease-and-temperature",
     "title": "Research",
     "section": "",
-    "text": "Vector-borne diseases (VBDs) are major sources of illness and mortality in humans, especially in developing countries, as well as in plants and animals. The dynamics of many VDBs such as malaria, dengue, Zika, and huanglongbing, are greatly influenced by extrinsic environmental factors, such as temperature. As climate changes over time the distribution of both epidemic and endemic VBDs will likely change, presenting new challenges for control. Thus, a better understanding of how the dynamics of VBDs depend on environmental factors such as temperature will be vital for understanding when and where VBDs will spread."
+    "text": "Vector-borne diseases (VBDs) are major sources of illness and mortality in humans, especially in developing countries, as well as in plants and animals. The dynamics of many VDBs such as malaria, dengue, Zika, and huanglongbing, are greatly influenced by extrinsic environmental factors, such as temperature. As climate changes over time the distribution of both epidemic and endemic VBDs will likely change, presenting new challenges for control. Thus, a better understanding of how the dynamics of VBDs depend on environmental factors such as temperature will be vital for understanding when and where VBDs will spread.\n\n\nkey: * - postdoctoral advisee; \\(\\dagger\\) - graduate student advisee (including committees); ug - undergraduate advisee\n\nDennington, N.L., M.K. Grossman, F. Ware-Gilmore, J.L. Teeple, L.R. Johnson, M.S. Shocket, E.A. McGraw, and M.B. Thomas. “Phenotypic adaptation to temperature in the mosquito vector, Aedes aegypti”. Global Change Biology, vol. 30, no. 1, 2024, e17041.\nPawar, S., P.J. Huxley\\(^*\\), T.R. Smallwood, M.L. Nesbit, A.H. Chan, M.S. Shocket, L.R. Johnson, D.-G. Kontopoulos, and L. Cator. “Variation in temperature of peak trait performance constrains adaptation of arthropod populations to climatic warming”. Nature Ecology and Evolution, 2024, online early. https://doi.org/10.1038/s41559-023-02301-8.\nBrown, J.J., M. Pascual, M.C. Wimberly, L.R. Johnson, and C.C. Murdock. “Humidity – The overlooked variable in the thermal biology of mosquito-borne disease”. Ecology Letters, 2023. https://doi.org/10.1111/ele.14228.\n\n\n\n\n\nCollaborative Research: MRA: Using NEON data to elucidate the ecological effects of global environmental change on phenology across time and space. NSF DEB #2017463.\nCollaborative Research: CIBR: VectorByte: A Global Informatics Platform for studying the Ecology of Vector-Borne Diseases. NSF DBI #2016264.\nCAREER: Quantifying heterogeneity and uncertainty in the transmission of vector borne dis- eases with a Bayesian trait-based framework. NSF DMS/DEB #1750113"
   },
   {
     "objectID": "research.html#bayesian-inference-for-ecological-models",
     "href": "research.html#bayesian-inference-for-ecological-models",
     "title": "Research",
     "section": "Bayesian inference for ecological models",
-    "text": "Bayesian inference for ecological models\nDifferential equations (DEs) are commonly used to model the temporal evolution of biological systems, but statistical methods for comparing DE models to data and for parameter inference are relatively poorly developed. This is especially problematic in the context of biological systems where observations are often noisy and only a small number of time points may be available.\nBayesian approaches offer a coherent framework for parameter inference that can account for multiple sources of uncertainty, while making use of prior information. We have developed deBInfer, an R package implementing a Bayesian framework for parameter inference in DEs. This approach offers a rigorous methodology for parameter inference as well as modeling the link between unobservable model states and parameters, and observable quantities.\ndeBInfer is freely available on CRAN!\nRelated publications\nBoersch‐Supan, P.H., Ryan, S.J. and Johnson, L.R., 2017. deBInfer: Bayesian inference for dynamical models of biological systems in R. Methods in Ecology and Evolution, 8(4), pp.511-518."
+    "text": "Bayesian inference for ecological models\nEcological models come in many flavors from relatively simple response functions (such as thermal performance curves) to differential equations and state-space models. Bayesian approaches offer a coherent framework for parameter inference that can account for multiple sources of uncertainty, while making use of prior information. In our lab we use Bayesian approaches to fit models of varying complexity to better understand biological processes. We often develop software packages (primarily in R) to support the adoption of these methods by other scientists.\n\nRecent Papers\n\nSmith\\(^\\dagger\\), J.W., R.Q. Thomas, and L.R. Johnson. “Parameterizing Lognormal state space models using moment matching”. Environmental and Ecological Statistics, vol. 30, no. 3, 2023, pp. 385–419.\nSmith Jr\\(^\\dagger\\), J.W., L.R. Johnson, and R.Q. Thomas. “Assessing ecosystem state space models: Identifiability and estimation”. Journal of Agricultural, Biological and Environmental Statistics, 2023, pp. 1–24.\nZhang, B., R.B. Gramacy, L.R. Johnson, K.A. Rose, and E. Smith. “Batch-sequential design and heteroskedastic surrogate modeling for delta smelt conservation”. The Annals of Applied Statistics, vol. 16, no. 2, 2022, pp. 816–42.\nGajewski\\(^\\dagger\\), Z., L.A. Stevenson, D.A. Pike, E.A. Roznik, R.A. Alford, and L.R. Johnson. “Predicting the growth of the amphibian chytrid fungus in varying temperature environments”. Ecology and Evolution, vol. 11, no. 24, 2021, pp. 17920–31.\n\n\n\nCurrent Grants\n\nCAREER: Quantifying heterogeneity and uncertainty in the transmission of vector borne dis- eases with a Bayesian trait-based framework. NSF DMS/DEB #1750113"
+  },
+  {
+    "objectID": "research.html#packages",
+    "href": "research.html#packages",
+    "title": "Research",
+    "section": "Packages",
+    "text": "Packages\n\nBayesian Inference for Differential Equations\nDifferential equations (DEs) are commonly used to model the temporal evolution of biological systems, but statistical methods for comparing DE models to data and for parameter inference are relatively poorly developed. This is especially problematic in the context of biological systems where observations are often noisy and only a small number of time points may be available. We have developed deBInfer, an R package implementing a Bayesian framework for parameter inference in DEs. This approach offers a rigorous methodology for parameter inference as well as modeling the link between unobservable model states and parameters, and observable quantities.\n\nBoersch‐Supan, P.H., Ryan, S.J. and Johnson, L.R., 2017. “deBInfer: Bayesian inference for dynamical models of biological systems in R”. Methods in Ecology and Evolution, 8(4), pp.511-518.\ndeBInfer package on CRAN"
   },
   {
     "objectID": "VB.html",
@@ -250,5 +264,33 @@
     "title": "VectorBiTE and VectorByte",
     "section": "VectorBiTE RCN",
     "text": "VectorBiTE RCN\nLeah Johnson is the US PI of the Vector Behavior in Transmission Ecology Research Coordination Network (VectorBiTE RCN). The VectorBiTE RCN is a join NIH and BBSRC funded initiative that seeks to\n\nincrease the interaction between researchers in the diverse fields studying Vector-borne diseases\nencourage collection and consolidation of key data, and\nencourage development of analytical tools to better understand the role of vector behavior in transmission ecology.\n\nMore information about the RCN and opportunities for participation is available at www.vectorbite.org"
+  },
+  {
+    "objectID": "joeh.html#bio",
+    "href": "joeh.html#bio",
+    "title": "Joe Harrison",
+    "section": "",
+    "text": "Joe is a senior in Statistics and Computational Modeling & Data Analytics. He currently plans on attending NC State in the Spring as a PhD student, under the direction of Dr. Ryan Martin, investigating the intersection of Frequentist and Bayesian Methodologies.\nIn the lab, Joe helps with the data collection process and uses his Bayesian knowledge in order to fit TPCs. Outside the lab, Joe enjoys playing chess, singing within choir, and browsing R packages."
+  },
+  {
+    "objectID": "aliciaA.html#bio",
+    "href": "aliciaA.html#bio",
+    "title": "Alicia Arneson",
+    "section": "",
+    "text": "I am a PhD student in the biology department at Virginia Tech. I am broadly interested in using statistical and mathematical models to make sense of biological data. For my dissertation, I am using mathematical models to explore how bird feeders play a role in transmitting disease in wild birds. In the QED lab, I am working on a project to determine how life history data can be shared across species of ticks to improve our understanding of the prevalence of less studied tick species."
+  },
+  {
+    "objectID": "piperZ.html#bio",
+    "href": "piperZ.html#bio",
+    "title": "Piper Zimmerman",
+    "section": "",
+    "text": "Piper is a 3rd year PhD candidate in the statistics department at Virginia Tech. With her advisor, Leah Johnson, she works on modeling lifetime and mortality of insects.\nOutside of academics, she enjoys running, juicing, and walking her dog."
+  },
+  {
+    "objectID": "parulP.html#bio",
+    "href": "parulP.html#bio",
+    "title": "Parul Patil",
+    "section": "",
+    "text": "I am a Third Year PhD Student in the department of Statistics at Virginia Tech. My research interest is in the field of Gaussian Processes. Currently I am working on forecasting Tick Populations using a Gaussian Process model."
   }
 ]

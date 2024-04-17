@@ -1,7 +1,10 @@
 ---
 title: "Joe Harrison"
+format:
+  html:
+    toc: false
 about:
-  template: jolla
+  template: trestles
   image: images/tux.png
   links:
     - icon: github
@@ -16,10 +19,8 @@ about:
 document-css: true
 ---
 
-Joe is a senior in Statistics and Computational Modeling & Data Analytics. 
-He currently plans on attending NC State in the Spring as a PhD student, under the direction of Dr. Ryan Martin, 
-investigating the intersection of Frequentist and Bayesian Methodologies. 
+## Bio
 
-In the lab, Joe helps with the data collection process and uses his Bayesian knowledge
-in order to fit TPCs. 
-Outside the lab, Joe enjoys playing chess, singing within choir, and browsing R packages. 
+Joe is a senior in Statistics and Computational Modeling & Data Analytics. He currently plans on attending NC State in the Spring as a PhD student, under the direction of Dr. Ryan Martin, investigating the intersection of Frequentist and Bayesian Methodologies.
+
+In the lab, Joe helps with the data collection process and uses his Bayesian knowledge in order to fit TPCs. Outside the lab, Joe enjoys playing chess, singing within choir, and browsing R packages.

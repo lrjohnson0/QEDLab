@@ -1,7 +1,10 @@
 ---
 title: "Dr. Leah R. Johnson"
+format:
+  html:
+    toc: false
 about:
-  template: jolla
+  template: trestles
   image: images/leah.jpg
   links:
     - icon: google
@@ -27,24 +30,24 @@ I am an Associate Professor of Statistics at Virginia Tech. My research interest
 
 ## Education
 
-**University of California Santa Cruz** | Santa Cruz, CA
+**University of California Santa Cruz** \| Santa Cruz, CA
 
-Ph.D. in Physics/Applied Math and Statistics | 2006
+Ph.D. in Physics/Applied Math and Statistics \| 2006
 
-**University of California Santa Cruz** | Santa Cruz, CA
+**University of California Santa Cruz** \| Santa Cruz, CA
 
-M.S. in Physics | 2003
+M.S. in Physics \| 2003
 
-**College of William and Mary** | Williamsburg, VA
+**College of William and Mary** \| Williamsburg, VA
 
-B.S. in Physics | 2001
+B.S. in Physics \| 2001
 
 <br>
 
 ## Major Projects
 
-**[VectorBiTE RCN](http://vectorbite.org/)** | US PI
+[**VectorBiTE RCN**](http://vectorbite.org/) \| US PI
 
-**[VectorByte Initiative](https://www.vectorbyte.org/)** | PI
+[**VectorByte Initiative**](https://www.vectorbyte.org/) \| PI
 
-**[Ecological Forecasting Initiative RCN](https://ecoforecast.org/rcn/)** | Steering Committee
+[**Ecological Forecasting Initiative RCN**](https://ecoforecast.org/rcn/) \| Steering Committee

@@ -1,7 +1,10 @@
 ---
 title: "Dr. Paul Huxley"
+format:
+  html:
+    toc: false
 about: 
-  template: jolla
+  template: trestles
   image: images/paul-headshot.jpg
   links:
     - icon: google
