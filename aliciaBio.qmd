@@ -2,7 +2,7 @@
 title: "Alicia Arneson"
 about:
   template: trestles
-  image: aliciaMarathon2.jpg
+  image: AliciaAndWinnie.jpg
   links:
     - icon: google
       text: Google Scholar
