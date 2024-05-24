@@ -1,6 +1,6 @@
 project:
   type: website
-  output-dir: "_site"
+  output-dir: docs
 resources: 
   - lrjohnsonCV.pdf
   - paul-cv.pdf
@@ -44,6 +44,7 @@ website:
 format:
   html:
     page-layout: full
+    column: screen-inset
     theme:
       - united
       - custom.scss

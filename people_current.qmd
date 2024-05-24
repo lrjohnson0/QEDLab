@@ -1,33 +1,34 @@
 ---
-title: "Current Lab Members"
-description: |
-  Current members of the QED Lab.
+title: "Current QED Lab Members"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-# Principal Investigator
+<br>
+<br>
 
-### [Dr. Leah R. Johnson](leahJ.html)
+## Principal Investigator
 
-# Postdoctoral Researchers
+#### [Dr. Leah R. Johnson](leahJ.html)
 
-### [Dr. Paul Huxley](paulH.html)
+## Postdoctoral Researchers
 
-# Graduate Students
+#### [Dr. Paul Huxley](paulH.html)
 
-### [Alicia Arneson (Biology)](aliciaA.html)
+## Graduate Students
 
-### [Piper Zimmerman (Stats)](piperZ.html)
+#### [Alicia Arneson (Biology)](aliciaA.html)
 
-### [Parul Patil (Stats)](parulP.html)
+#### [Piper Zimmerman (Stats)](piperZ.html)
 
-# Undergraduate Student Researchers
+#### [Parul Patil (Stats)](parulP.html)
 
--   [Sean Sorek](seanS.html)
--   [Joe Harrison](joeH.html)
+## Undergraduate Student Researchers
+
+####   [Sean Sorek](seanS.html)
+####   [Joe Harrison](joeH.html)
 
 ```{=html}
 <!-- Default Statcounter code for QED
