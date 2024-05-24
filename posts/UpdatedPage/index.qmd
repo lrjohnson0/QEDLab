@@ -1,0 +1,15 @@
+---
+title: "Welcome to our New Quarto Website"
+description: ""
+author: "Leah R Johnson"
+date: "2024-05-24"
+draft: false
+categories:
+  - news
+citation: false
+---
+
+After a lot of work, we have finally updated the lab website! We are now using [Quarto](https://quarto.org/) and hosting through github. 
+
+We're hoping that this will make it easier for us to maintain the website, and especially make it easier to add new content. So expect some new blogs by various lab members in the future! 
+
