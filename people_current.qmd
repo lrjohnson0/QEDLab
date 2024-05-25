@@ -28,7 +28,7 @@ knitr::opts_chunk$set(echo = FALSE)
 ## Undergraduate Student Researchers
 
 ####   [Sean Sorek](seanS.html)
-####   [Joe Harrison](joeH.html)
+####   [Joe Harrison](joeh.html)
 
 ```{=html}
 <!-- Default Statcounter code for QED
