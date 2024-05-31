@@ -21,7 +21,7 @@ document-css: true
 
 ## Bio 
 
-I am a PhD student in the biology department at Virginia Tech. I am broadly interested in using statistical and mathematical models to make sense of biological data. For my dissertation, I am using mathematical models to explore how bird feeders play a role in transmitting disease in wild birds. In the QED lab, I am working on a project to determine how life history data can be shared across species of ticks to improve our understanding of the prevalence of less studied tick species.
+Alicia is a PhD student in the biology department at Virginia Tech. She is broadly interested in using statistical and mathematical models to make sense of biological data. For my dissertation, Alicia is using mathematical models to explore how bird feeders play a role in transmitting disease in wild birds. In the QED lab, she is working on a project to determine how life history data can be shared across species of ticks to improve our understanding of the prevalence of less studied tick species.
 
 ## Education
 

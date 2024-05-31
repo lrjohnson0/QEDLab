@@ -24,7 +24,7 @@ document-css: true
 
 ## Bio
 
-I am an Associate Professor of Statistics at Virginia Tech. My research interests are in statistical and mathematical biology, ecology, and epidemiology. In particular, I am interested in how individual behavior and local interactions between individuals in a population influence population level patterns, and statistical methodologies for inference of mechanistic models of biological systems. I am also moving into ecological forecasting.
+Dr. Johnson is an Associate Professor of Statistics at Virginia Tech. Her research interests are in statistical and mathematical biology, ecology, and epidemiology. In particular, she is interested in how individual behavior and local interactions between individuals in a population influence population level patterns, and statistical methodologies for inference of mechanistic models of biological systems. Dr. Johnson is also moving into ecological forecasting.
 
 <br>
 

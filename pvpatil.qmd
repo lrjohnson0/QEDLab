@@ -6,7 +6,7 @@ about:
 document-css: true
 ---
 
-I am a Third Year PhD Student in the department of Statistics at Virginia Tech. My research interest is in the field of Gaussian Processes. Currently I am working on forecasting Tick Populations using a Gaussian Process model.   
+Parul am a Third Year PhD Student in the department of Statistics at Virginia Tech. Her research interest is in the field of Gaussian Processes. Currently Parul is working on forecasting Tick Populations using a Gaussian Process model.   
 
 ## Education
 
