@@ -7,53 +7,47 @@ description: ""
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-
-
 ## VectorByte
 
 [VectorByte](https://www.vectorbyte.org/) is a 5-year NSF [Division of Biological Infrastructure grant](https://www.nsf.gov/awardsearch/showAward?AWD_ID=2016264&HistoricalAwards=false), awarded to [Leah R. Johnson (Virginia Tech)](leah.html), [Sadie J. Ryan (University of Florida)](http://www.sadieryan.net/), [Samuel Rund (University of Notre Dame)](http://sites.nd.edu/samuel-rund/) in collaboration with [Samraat Pawar (Imperial College London)](https://mhasoba.pythonanywhere.com/pawarlab). VectorByte will establish a global open access data platform for biological trait and abundance data for human and non-human disease vectors. It will also provide analysis tools and training to a wide audience of researchers and practitioners.
 
-__For more information visit [https://www.vectorbyte.org/](https://www.vectorbyte.org/)__
+**For more information visit <https://www.vectorbyte.org/>**
 
-
-
-<br>
-<br>
-<br>
+<br> <br> <br>
 
 ## VectorBiTE RCN
 
-[Leah Johnson](leah.html) is the US PI of the Vector Behavior in Transmission Ecology Research Coordination Network ([VectorBiTE RCN](http://vectorbite.org/)). The VectorBiTE RCN is a join NIH and BBSRC funded initiative that seeks to
+[Leah Johnson](leah.html) was the US PI of the Vector Behavior in Transmission Ecology Research Coordination Network ([VectorBiTE RCN](http://vectorbite.org/)). The VectorBiTE RCN was a join NIH and BBSRC funded initiative that seeks to
 
-- increase the interaction between researchers in the diverse fields studying Vector-borne diseases
-- encourage collection and consolidation of key data, and 
-- encourage development of analytical tools to better understand the role of vector behavior in transmission ecology.
+-   increase the interaction between researchers in the diverse fields studying Vector-borne diseases
+-   encourage collection and consolidation of key data, and
+-   encourage development of analytical tools to better understand the role of vector behavior in transmission ecology.
 
-__More information about the RCN and opportunities for participation is available at [www.vectorbite.org](http://vectorbite.org/)__
+**Although funding has ceased, the VectorBiTE Network is continuing. See the old website at [www.vectorbite.org](http://vectorbite.org/)**
 
-
-
-
-
-
+```{=html}
 <!-- Default Statcounter code for QED
 http://leah.johnson-gramacy.com/QED/ -->
+```
+```{=html}
 <script type="text/javascript">
 var sc_project=10740637; 
 var sc_invisible=1; 
 var sc_security="092cf49e"; 
 </script>
+```
+```{=html}
 <script type="text/javascript"
 src="https://www.statcounter.com/counter/counter.js"
 async></script>
-<noscript><div class="statcounter"><a title="web statistics"
-href="https://statcounter.com/" target="_blank"><img
-class="statcounter"
-src="https://c.statcounter.com/10740637/0/092cf49e/1/"
-alt="web statistics"></a></div></noscript>
+```
+<noscript>
+
+::: statcounter
+<a title="web statistics"
+href="https://statcounter.com/" target="_blank"><img src="https://c.statcounter.com/10740637/0/092cf49e/1/" alt="web statistics" class="statcounter"/></a>
+:::
+
+</noscript>
+
 <!-- End of Statcounter Code -->
-
-
-
-
-
