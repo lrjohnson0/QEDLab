@@ -12,7 +12,7 @@ about:
       url: https://scholar.google.com/citations?user=1CkxVtEAAAAJ&hl=en
     - icon: card-text
       text: CV
-      file: lrjohnsonCV.pdf
+      url: https://lrjohnson0.github.io/QEDLab/lrjohnsonCV.pdf
     - icon: twitter
       text: Twitter
       url: https://twitter.com/Lrjohnson0
