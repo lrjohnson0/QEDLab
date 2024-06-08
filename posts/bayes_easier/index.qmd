@@ -1,0 +1,13 @@
+---
+title: "Statistical Teaching as Software Design"
+description: "How to introduce users to new statistics without being scary."
+author: "Sean Sorek"
+date: "2024-06-06"
+draft: true
+categories:
+  - teaching
+  - bayesTPC
+citation: false
+---
+
+The only thing harder than analyzing data yourself is analyzing someone else's data. Especially when you don't know what the data is or who that someone is or (worst of all) if that person knows how to analyze their data. In my experience, people don't like change when dealing with a subject they don't quite understand. This can manifest in science as the dominance of basic frequentist techniques over their Bayesian counterparts for no reason other than tradition. Whether either framework is better than the other is a difficult question (and one I am not knowledgeable enough to comprehensively answer), but the fact remains that most scientists would rather just use what they have already been using. I've personally had friends describe the dichotomy between frequentist and Bayesian statistics as "pedantic bickering" and "nerd fighting", despite how important it may seem to us statisticians. Rather than argue back, we can work around this apathy through careful design. In other words, we can introduce scientists with relatively little statistical knowledge to new techniques by providing access to those techniques with less new knowledge up front.
