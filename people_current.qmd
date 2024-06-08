@@ -7,6 +7,10 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 <br>
+
+<center>![](images/lab_W2024.jpeg){width="75%"}</center>
+
+
 <br>
 
 ## Principal Investigator
@@ -27,8 +31,9 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Undergraduate Student Researchers
 
-####   [Sean Sorek](seanS.html)
-####   [Joe Harrison](joeh.html)
+#### [Sean Sorek](seanS.html)
+
+#### [Joe Harrison](joeh.html)
 
 ```{=html}
 <!-- Default Statcounter code for QED

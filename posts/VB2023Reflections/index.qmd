@@ -1,0 +1,28 @@
+---
+title: "Reflections from the 2023 VectorByte Training Workshop"
+description: ""
+author: "Alicia Arneson, Paul Huxley, and Piper Zimmerman"
+date: "2024-06-07"
+draft: false
+categories:
+  - news
+  - VectorByte
+  - training
+citation: false
+---
+
+As the time for the 2024 VectorByte training workshop approaches, we found ourselves reminiscing about last year's exciting experience in anticipation of this year.
+
+The [2023 VectorByte training workshop](https://vectorbyteorg.github.io/vectorbyte-training4/) was held from the 18th to the 20th of July at [Virginia Tech](www.vt.edu) in Blacksburg, Virginia. The event welcomed fifteen enthusiastic early-career researchers after months of meticulous planning. Most attendees arrived on the evening of the 17th, traveling by bus from Roanoke Airport, and were greeted by the city's dramatic weather --- a brilliant sunset swiftly followed by rain and thunder.
+
+The workshop officially kicked off on the 18th of July. Trainees and trainers gathered for the opening session, where Dr. Lauren Cator introduced the concept of vector traits within the context of vector population dynamics and vector-borne disease transmission. This was followed by an introduction from Dr. Paul Huxley to VecTraits, a VectorByte database that houses thousands of records of vector life history traits across various species and life stages. VecTraits holds over 30,000 rows of fully open trait data, digitized from the literature on known and yet-to-be-determined arthropod vector species, including ticks, mosquitoes, and aphids. Participants were provided with a demonstration showing how to access the database and search for specific traits within it.
+
+Later in the day, there were hands-on sessions about wrangling data from VecTraits and using it for simple linear modelling. These sessions were designed not only to impart knowledge but also to stimulate discussion and collaboration among participants. Networking and social events were interspersed throughout the day, providing excellent opportunities for attendees to connect and exchange ideas.
+
+The second day consisted of more sessions focused on giving participants the skills to answer research questions via more advanced modelling techniques. All the sessions were designed to give participants a chance to see and experience potential applications for the data housed in VecTraits.
+
+On the third day, when participants were given the opportunity to apply the skills they learned to projects of their own interest. Participants worked alone or in groups to perform analyses relevant to their field of study. This gave folks the opportunity to do live troubleshooting with seasoned experts. At the end of the day, participants shared what they learned with small groups. It was an invaluable opportunity to gain insights and to forge new professional connections.
+
+One of the standout features of the training was the introduction to [`bayesTPC`](https://www.biorxiv.org/content/10.1101/2024.04.25.591212v1), an R package designed to easily fit Bayesian thermal performance curves. This package was designed by members of the QED lab and was in the final stages of initial development at the time of the workshop. After a demonstration was provided to show participants how to download and use the package, everyone took time to try using the package on their data set of choice. It served as an excellent opportunity both for participants to ask questions directly to the developers of the package and for the developers to get live feedback.
+
+The overall atmosphere was one of mutual support. Participants helped each other understand and apply the concepts, particularly during the practical sessions when trainers might not be immediately available. Many folks began discussing new scientific collaborations that would extend far beyond the end of the workshop dates. To cap off a fantastic meeting, many of the trainees and trainers gathered at a local restaurant for some well-deserved relaxation and camaraderie. The feedback from attendees was overwhelmingly positive, highlighting the value and impact of the training workshop. The 2023 VectorByte training workshop was more than just a series of lectures and practical sessions. It was a vibrant gathering of minds from various research areas, all focused on learning and applying the latest methods in mechanistic vector-borne disease modelling. There is no doubt it will lead to more rapid advancement in a field that is only becoming more important as our climate continues to warm.
