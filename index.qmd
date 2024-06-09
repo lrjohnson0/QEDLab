@@ -2,6 +2,7 @@
 website:
   title: "Quantitative Ecological Dynamics"
   description: "Dr. Leah R. Johnson -- Department of Statistics -- Virginia Tech"
+  toc: FALSE
 ---
 
 ```{r setup, include=FALSE}
@@ -21,7 +22,16 @@ Research questions in the QED lab fall into three complementary areas:
 
 ------------------------------------------------------------------------
 
-```{r}
+<br>
+
+:::{.column-screen-inset}
+<center>![](images/wordle.png){width="75%"}</center>
+:::
+
+<br>
+
+
+```{r, eval=FALSE}
 knitr::include_graphics("images/wordle.png")
 ```
 
