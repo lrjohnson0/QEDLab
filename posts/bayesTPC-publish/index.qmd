@@ -1,0 +1,17 @@
+---
+title: "Paper introducing bayesTPC is out in Methods in Ecology and Evolution"
+description: ""
+author: "Leah R Johnson"
+date: "2025-04-11"
+draft: false
+categories:
+  - news
+  - software
+  - bayesTPC
+citation: false
+---
+
+We are very pleased to announce that the [paper introducing bayesTPC](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.70004) has appeared in Methods in Ecology and Evolution. The [bayesTPC](https://github.com/johnwilliamsmithjr/bayesTPC) R package is for Bayesian fitting of Thermal Performance Curves (TPCs) to trait responses. The package is built using the [nimble](https://r-nimble.org/) language and machinery as the underlying engine for Markov Chain Monte Carlo (MCMC). The paper, led by former QED undergraduate researcher [Sean Sorek](seanS.qmd). Our main aims in releasing bayesTPC were to support the adoption of Bayesian approaches in thermal physiology, and to promote TPC fitting that adequately quantifies uncertainty. For a bit more information, take a look at the [blog post about the paper](https://www.vectorbyte.org/blog/paper-introducing-bayestpc-is-out-in-methods-in-ecology-and-evolution) over at the [VectorByte Initiative](https://www.vectorbyte.org).
+
+Sorek, S., Smith, J. W. Jr., Huxley, P. J., & Johnson, L. R. (2025). `bayesTPC`: Bayesian inference for thermal performance curves in *R*. Methods in Ecology and Evolution, 16, 687–697. [https://doi.org/10.1111/2041-210X.70004](https://doi.org/10.1111/2041-210X.70004)
+
