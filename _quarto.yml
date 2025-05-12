@@ -13,32 +13,32 @@ website:
     background: dark
     right:
       - text: "Home"
-        href: index.html
+        href: index.qmd
       - text: "People"
         menu:
           - text: "PI: Dr. LR Johnson"
-            href: leahJ.html
+            href: leahJ.qmd
           - text: "Current Members"
-            href: people_current.html
+            href: people_current.qmd
           - text: "Lab Alumni"
-            href: people_alumni.html
+            href: people_alumni.qmd
       - text: "Research"
         menu:
           - text: "Research Areas"
-            href: research.html
+            href: research.qmd
           - text: "VectorBiTE RCN and VectorByte"
-            href: VB.html
+            href: VB.qmd
       - text: "Publications"
-        href: publications.html
+        href: publications.qmd
+      - text: "Training"
+        href: training.qmd
       - text: "News/Blog"
-        href: news.html
+        href: news.qmd
       - text: "Opportunities"
-        href: opps.html
+        href: opps.qmd
       - icon: fa fa-twitter
         href: https://twitter.com/QEDlab
     search: true
-
-
 
 
 format:

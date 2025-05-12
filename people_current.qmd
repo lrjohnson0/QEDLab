@@ -19,7 +19,6 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Postdoctoral Researchers
 
-#### [Dr. Paul Huxley](paulH.html)
 
 ## Graduate Students
 
@@ -31,9 +30,6 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Undergraduate Student Researchers
 
-#### [Sean Sorek](seanS.html)
-
-#### [Joe Harrison](joeh.html)
 
 ```{=html}
 <!-- Default Statcounter code for QED

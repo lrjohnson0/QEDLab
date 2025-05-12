@@ -8,11 +8,11 @@ description: |
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-
-<br>
-<br>
+<br> <br>
 
 ## Postdoctoral Researchers
+
+#### [Dr. Paul Huxley](paulH.html)
 
 #### [Dr. Oswaldo Villena Carpio](https://scholar.google.com/citations?user=iYXom3MAAAAJ)
 
@@ -20,11 +20,9 @@ knitr::opts_chunk$set(echo = FALSE)
 
 #### [Dr. Rachel A. Taylor](https://rachelataylor.weebly.com/)
 
-
 ## Graduate Students
 
-
-#### [Dr. John W. Smith, Jr. ](https://johnwilliamsmithjr.github.io/) -- Virginia Tech, PhD, Statistics, 2022
+#### [Dr. John W. Smith, Jr.](https://johnwilliamsmithjr.github.io/) -- Virginia Tech, PhD, Statistics, 2022
 
 #### [Dr. Zachary Gajewski](https://scholar.google.com/citations?user=gVEASc8AAAAJ&hl=en) -- Virginia Tech PhD, Biology, 2021
 
@@ -38,6 +36,8 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Undergraduate Researchers (VT)
 
+-   [Sean Sorek](seanS.qmd)
+-   [Joe Harrison](joeh.qmd)
 -   Lauren Chapman (Statistics)
 -   Connor Lachance (Statistics)
 -   Iulia Voina (Statistics)
@@ -47,7 +47,6 @@ knitr::opts_chunk$set(echo = FALSE)
 -   Andrew Ahnn (CS & Math)
 -   Laelef Abebe
 -   Cordel Harris
-
 
 ## Undergraduate Researchers (USF)
 
@@ -61,6 +60,7 @@ knitr::opts_chunk$set(echo = FALSE)
 <!-- Default Statcounter code for QED
 http://leah.johnson-gramacy.com/QED/ -->
 ```
+
 ```{=html}
 <script type="text/javascript">
 var sc_project=10740637; 
@@ -68,11 +68,13 @@ var sc_invisible=1;
 var sc_security="092cf49e"; 
 </script>
 ```
+
 ```{=html}
 <script type="text/javascript"
 src="https://www.statcounter.com/counter/counter.js"
 async></script>
 ```
+
 <noscript>
 
 ::: statcounter
