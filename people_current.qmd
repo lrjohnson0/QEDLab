@@ -10,15 +10,20 @@ knitr::opts_chunk$set(echo = FALSE)
 
 <center>![](images/lab_W2024.jpeg){width="75%"}</center>
 
-
 <br>
 
 ## Principal Investigator
 
 #### [Dr. Leah R. Johnson](leahJ.html)
 
+<br>
+
 ## Postdoctoral Researchers
 
+#### Dr. Cat Lippi
+
+
+<br>
 
 ## Graduate Students
 
@@ -28,13 +33,18 @@ knitr::opts_chunk$set(echo = FALSE)
 
 #### [Parul Patil (Stats)](parulP.html)
 
+<br>
+
 ## Undergraduate Student Researchers
 
+- Yusi Yao
+- Sana Sahwney
 
 ```{=html}
 <!-- Default Statcounter code for QED
 http://leah.johnson-gramacy.com/QED/ -->
 ```
+
 ```{=html}
 <script type="text/javascript">
 var sc_project=10740637; 
@@ -42,11 +52,13 @@ var sc_invisible=1;
 var sc_security="092cf49e"; 
 </script>
 ```
+
 ```{=html}
 <script type="text/javascript"
 src="https://www.statcounter.com/counter/counter.js"
 async></script>
 ```
+
 <noscript>
 
 ::: statcounter
