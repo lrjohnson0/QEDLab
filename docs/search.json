@@ -249,7 +249,7 @@
     "href": "training/EFI2025.html#preparation",
     "title": "EFI 2025: Introduction to Gaussian Process Modeling of time dependent ecological data in R",
     "section": "Preparation",
-    "text": "Preparation\nWorkshop participants should download and install the following R packages from cran:\n\nlaGP\nhetGP"
+    "text": "Preparation\nWorkshop participants should download and install the following R packages from cran:\n\nlaGP\nhetGP\nggplot2\nmvtnorm"
   },
   {
     "objectID": "training/EFI2025.html#training-materials",
