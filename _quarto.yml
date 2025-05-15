@@ -11,7 +11,7 @@ website:
 
   navbar:
     background: dark
-    right:
+    left:
       - text: "Home"
         href: index.qmd
       - text: "People"
@@ -36,7 +36,10 @@ website:
         href: news.qmd
       - text: "Opportunities"
         href: opps.qmd
-      - icon: fa fa-twitter
+    right:
+      - icon: github
+        href: https://github.com/lrjohnson0/QEDLab
+      - icon: twitter
         href: https://twitter.com/QEDlab
     search: true
 
