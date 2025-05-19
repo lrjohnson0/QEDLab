@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.23">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Parul Vijay Patil, Leah R. Johnson, Robert B. Gramacy">
+<meta name="dcterms.date" content="2024-07-21">
+
+<title>Introduction to Gaussian Processes for Time Dependent Data (Practical) – QED Lab @ VT</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-226bd0f977fa82dfae4534cac220d79a.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-ade33c31e2f62088e3c9091dd0eb13e7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">QED Lab @ VT</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-people" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">People</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-people">    
+        <li>
+    <a class="dropdown-item" href="../../leahJ.html">
+ <span class="dropdown-text">PI: Dr.&nbsp;LR Johnson</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../people_current.html">
+ <span class="dropdown-text">Current Members</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../people_alumni.html">
+ <span class="dropdown-text">Lab Alumni</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-research" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Research</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-research">    
+        <li>
+    <a class="dropdown-item" href="../../research.html">
+ <span class="dropdown-text">Research Areas</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../VB.html">
+ <span class="dropdown-text">VectorBiTE RCN and VectorByte</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../training.html"> 
+<span class="menu-text">Training</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../news.html"> 
+<span class="menu-text">News/Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../opps.html"> 
+<span class="menu-text">Opportunities</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/lrjohnson0/QEDLab"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/QEDlab"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#objectives" id="toc-objectives" class="nav-link active" data-scroll-target="#objectives">Objectives</a></li>
+  <li><a href="#basics-fitting-a-gp-model" id="toc-basics-fitting-a-gp-model" class="nav-link" data-scroll-target="#basics-fitting-a-gp-model">Basics: Fitting a GP Model</a></li>
+  <li><a href="#using-gps-for-data-on-tick-abundances-over-time" id="toc-using-gps-for-data-on-tick-abundances-over-time" class="nav-link" data-scroll-target="#using-gps-for-data-on-tick-abundances-over-time">Using GPs for data on tick abundances over time</a>
+  <ul class="collapse">
+  <li><a href="#overview-of-the-data" id="toc-overview-of-the-data" class="nav-link" data-scroll-target="#overview-of-the-data">Overview of the Data</a></li>
+  <li><a href="#initial-setup" id="toc-initial-setup" class="nav-link" data-scroll-target="#initial-setup">Initial Setup</a></li>
+  <li><a href="#predictors" id="toc-predictors" class="nav-link" data-scroll-target="#predictors">Predictors</a></li>
+  <li><a href="#model-fitting" id="toc-model-fitting" class="nav-link" data-scroll-target="#model-fitting">Model Fitting</a></li>
+  <li><a href="#gp-model" id="toc-gp-model" class="nav-link" data-scroll-target="#gp-model">GP Model</a></li>
+  <li><a href="#hetgp-model" id="toc-hetgp-model" class="nav-link" data-scroll-target="#hetgp-model">HetGP Model</a></li>
+  </ul></li>
+  <li><a href="#challenges" id="toc-challenges" class="nav-link" data-scroll-target="#challenges">Challenges</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Introduction to Gaussian Processes for Time Dependent Data (Practical)</h1>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Parul Vijay Patil, Leah R. Johnson, Robert B. Gramacy </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Virginia Tech
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">July 21, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="objectives" class="level1">
+<h1>Objectives</h1>
+<p>This practical will lead you through fitting a few versions of GPs using two R packages: <code>laGP</code> <span class="citation" data-cites="laGP">(<a href="#ref-laGP" role="doc-biblioref">Gramacy 2016</a>)</span> and <code>hetGP</code> <span class="citation" data-cites="binois2021hetgp">(<a href="#ref-binois2021hetgp" role="doc-biblioref">Binois and Gramacy 2021</a>)</span>. We will begin with a toy example from the lecture and then move on to a real data example to forecast tick abundances for a NEON site.</p>
+</section>
+<section id="basics-fitting-a-gp-model" class="level1 page-columns page-full">
+<h1>Basics: Fitting a GP Model</h1>
+<p>Here’s our function from before: <span class="math display">Y(x) = 5 \sin(x)</span> Now, let’s learn how we actually use the library <code>laGP</code> to fit a GP and make predictions at new locations. Let’s begin by loading some libraries</p>
+<div class="cell" data-warn.conflicts="false">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mvtnorm)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(laGP)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hetGP)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we create the data for our example. <code>(X, y)</code> is our given data,</p>
+<div class="cell" data-warn.conflicts="false">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># number of data points</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">8</span> </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Inputs - between 0 and 2pi</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="sc">*</span>pi, <span class="at">length=</span> n), <span class="at">ncol=</span><span class="dv">1</span>) </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating the response using the formula</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="dv">5</span><span class="sc">*</span><span class="fu">sin</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>First we use the <code>newGP</code> function to fit our GP. In this function, we need to pass in our inputs, outputs and any known parameters. If we do not know parameters, we can pass in some prior information we know about the parameters (which we will learn shortly) so that calculating the MLE is easier. Here, <code>X</code> indicates the input which must be a matrix, <code>Z</code> is used for response which is a vector, <code>d</code> is used for <span class="math inline">\theta</span> (length-scale), a scalar, which we assume to be known and equal to 1 and <code>g</code> is the nugget effect which is also a scalar. We pass in a very small value for numeric stability.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fitting GP </span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>gpi <span class="ot">&lt;-</span> <span class="fu">newGP</span>(<span class="at">X =</span> X, <span class="at">Z =</span> y, <span class="at">d =</span> <span class="dv">1</span>, <span class="at">g =</span> <span class="fu">sqrt</span>(.Machine<span class="sc">$</span>double.eps))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we have fit the GP and if you print gpi it only outputs a number. This is because it assigns a number to the model as a reference but has everything stored within it. We needn’t get into the details of this in this tutorial. We can assume that our model is stored in <code>gpi</code> and all we see is the reference number.</p>
+<p>We will use <code>XX</code> as our predictive set i.e.&nbsp;we want to make predictions at those input locations. I have created this as a vector of 100 points between -0.5 and <span class="math inline">2 \pi</span> + 0.5. We are essentially using 8 data points to make predictions at 100 points. Let’s see how we do. We make use of the <code>predGP</code> function.</p>
+<p>We need to pass our GP object as <code>gpi</code> = gpi (in our case) and the predictive input locations <code>XX</code> = XX for this.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predictions</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating a prediction set: sequence from -0.5 to 2*pi + 0.5 with 100 evenly spaced points</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>XX <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="fl">0.5</span>, <span class="dv">2</span><span class="sc">*</span>pi <span class="sc">+</span> <span class="fl">0.5</span>, <span class="at">length=</span> <span class="dv">100</span>), <span class="at">ncol=</span><span class="dv">1</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Using the function to make predictions using our gpi object</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>yy <span class="ot">&lt;-</span> <span class="fu">predGP</span>(<span class="at">gpi =</span> gpi, <span class="at">XX =</span> XX)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># This will tell us the results that we have stored.</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(yy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "mean"  "Sigma" "df"    "llik" </code></pre>
+</div>
+</div>
+<p><code>names(yy)</code> will tell us what is stored in <code>yy</code>. As we can see, we have the mean i.e.&nbsp;the mean predictions <span class="math inline">\mu</span> and, Sigma i.e.&nbsp;the covariance matrix <span class="math inline">\Sigma</span>.</p>
+<p>Now we can draw 100 random draws using the mean and variance matrix we obtained. We will also obtain the confidence bounds as shown below:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Since our posterior is a distribution, we take 100 samples from this.</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>YY <span class="ot">&lt;-</span> <span class="fu">rmvnorm</span> (<span class="dv">100</span>, yy<span class="sc">$</span>mean, yy<span class="sc">$</span>Sigma)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># We calculate the 95% bounds</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>q1 <span class="ot">&lt;-</span> yy<span class="sc">$</span>mean <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fl">0.025</span>, <span class="dv">0</span>, <span class="fu">sqrt</span>(<span class="fu">diag</span>(yy<span class="sc">$</span>Sigma))) </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>q2 <span class="ot">&lt;-</span> yy<span class="sc">$</span>mean <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>, <span class="dv">0</span>, <span class="fu">sqrt</span>(<span class="fu">diag</span>(yy<span class="sc">$</span>Sigma))) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, we will plot the mean prediction and the bounds along with each of our 100 draws.</p>
+<div class="cell page-columns page-full" data-layout-align="center" data-warn.conflicts="false">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Now for the plot</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">XX =</span> <span class="fu">rep</span>(XX, <span class="at">each =</span> <span class="dv">100</span>),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">YY =</span> <span class="fu">as.vector</span>(YY),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Line =</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, <span class="dv">100</span>))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Plotting all 100 draws from our distribution</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> df<span class="sc">$</span>XX, <span class="at">y =</span> df<span class="sc">$</span>YY, <span class="at">group =</span> df<span class="sc">$</span>Line), <span class="at">color =</span> <span class="st">"darkgray"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">linewidth =</span><span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Plotting our data points</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> X, <span class="at">y =</span> y), <span class="at">shape =</span> <span class="dv">20</span>, <span class="at">size =</span> <span class="dv">10</span>, <span class="at">color =</span> <span class="st">"darkblue"</span>) <span class="sc">+</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Plotting the mean from our 100 draws</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> XX, <span class="at">y =</span> yy<span class="sc">$</span>mean), <span class="at">size =</span> <span class="dv">1</span>, <span class="at">linewidth =</span><span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Adding the True function</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> XX, <span class="at">y =</span> <span class="dv">5</span><span class="sc">*</span><span class="fu">sin</span>(XX)), <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linewidth =</span><span class="dv">3</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Adding quantiles</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> XX, <span class="at">y =</span> q1), <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">1</span>,</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.7</span>,<span class="at">linewidth =</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> XX, <span class="at">y =</span> q2), <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">1</span>,</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.7</span>,<span class="at">linewidth =</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"x"</span>, <span class="at">y =</span> <span class="st">"y"</span>) <span class="sc">+</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Setting the themes</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">25</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">25</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">r =</span> <span class="dv">10</span>), <span class="at">size =</span> <span class="dv">20</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">r =</span> <span class="dv">10</span>), <span class="at">size =</span> <span class="dv">20</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>),</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>, <span class="at">color =</span> <span class="st">"white"</span>),</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"black"</span>)) <span class="sc">+</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display page-columns page-full">
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><img src="GP_Practical_files/figure-html/unnamed-chunk-6-1.png" class="column-body img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Looks pretty cool.</p>
+</section>
+<section id="using-gps-for-data-on-tick-abundances-over-time" class="level1 page-columns page-full">
+<h1>Using GPs for data on tick abundances over time</h1>
+<p>We will try all this on a simple dataset: Tick Data from <a href="https://projects.ecoforecast.org/neon4cast-docs/Ticks.html">NEON Forecasting Challenge</a> We will first learn a little bit about this dataset, followed by setting up our predictors and using them in our model to predict tick density for the future season. We will also learn how to fit a separable GP and specify priors for our parameters. Finally, we will learn some basics about a HetGP (Heteroskedastic GP) and try and fit that model as well.</p>
+<section id="overview-of-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="overview-of-the-data">Overview of the Data</h2>
+<ul>
+<li><p><strong>Objective</strong>: Forecast tick density for 4 weeks into the future</p></li>
+<li><p><strong>Sites</strong>: The data is collected across 9 different sites, each plot was of size 1600<span class="math inline">m^2</span> using a drag cloth</p></li>
+<li><p><strong>Data</strong>: Sparse and irregularly spaced. We only have ~650 observations across 10 years at 9 locations</p></li>
+</ul>
+<p>Let’s start with loading all the libraries that we will need, load our data and understand what we have.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(laGP)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Pulling the data from the NEON data base. </span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>target <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"https://data.ecoforecast.org/neon4cast-targets/ticks/ticks-targets.csv.gz"</span>, <span class="at">guess_max =</span> <span class="fl">1e1</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizing the data</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(target)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  datetime   site_id variable             observation iso_week
+  &lt;date&gt;     &lt;chr&gt;   &lt;chr&gt;                      &lt;dbl&gt; &lt;chr&gt;   
+1 2015-04-20 BLAN    amblyomma_americanum        0    2015-W17
+2 2015-05-11 BLAN    amblyomma_americanum        9.82 2015-W20
+3 2015-06-01 BLAN    amblyomma_americanum       10    2015-W23
+4 2015-06-08 BLAN    amblyomma_americanum       19.4  2015-W24
+5 2015-06-22 BLAN    amblyomma_americanum        3.14 2015-W26
+6 2015-07-13 BLAN    amblyomma_americanum        3.66 2015-W29</code></pre>
+</div>
+</div>
+</section>
+<section id="initial-setup" class="level2">
+<h2 class="anchored" data-anchor-id="initial-setup">Initial Setup</h2>
+<ul>
+<li><p>For a GP model, we assume the response (<span class="math inline">Y</span>) should be normally distributed.</p></li>
+<li><p>Since tick density, our response, must be greater than 0, we need to use a transform.</p></li>
+<li><p>The following is the most suitable transform for our application:</p></li>
+</ul>
+<!-- # log+1 -->
+<p><span class="math display">\begin{equation}
+\begin{aligned}
+f(y) &amp; = \log (y + 1) \\[2pt]
+\end{aligned}
+\end{equation}</span></p>
+<p>We pass in (<code>response</code> + 1) into this function to ensure we don’t take a log of 0. We will adjust this in our back transform.</p>
+<p>Let’s write a function for this, as well as the inverse of the transform.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># transforms y</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">log</span>(x <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(y)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># This function back transforms the input argument</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>fi <span class="ot">&lt;-</span> <span class="cf">function</span>(y) {</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">exp</span>(y) <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(x)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="predictors" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="predictors">Predictors</h2>
+<ul>
+<li>The goal is to forecast tick populations for a season so our response (Y) here, is the tick density. However, we do not have a traditional data set with an obvious input space. What is the X? <!-- interactive --></li>
+</ul>
+<p>We made a few plots earlier to help us identify what can be useful:</p>
+<!-- - $X_1$ Week Number: The week in which the tick density was recorded starting from week 1. Week number does not repeat itself (unlike iso-week). -->
+<p><span class="math inline">X_1</span> Iso-week: This is the iso-week number</p>
+<p>Let’s convert the <code>iso-week</code> from our <code>target</code> dataset as a numeric i.e.&nbsp;a number. Here is a function to do the same.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This function tells us the iso-week number given the date</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>fx.iso_week <span class="ot">&lt;-</span> <span class="cf">function</span>(datetime){</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Gives ISO-week in the format yyyy-w## and we extract the ##</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  x1 <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(stringr<span class="sc">::</span><span class="fu">str_sub</span>(ISOweek<span class="sc">::</span><span class="fu">ISOweek</span>(datetime), <span class="dv">7</span>, <span class="dv">8</span>)) <span class="co"># find iso week #</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(x1)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>target<span class="sc">$</span>week <span class="ot">&lt;-</span> <span class="fu">fx.iso_week</span>(target<span class="sc">$</span>datetime)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(target)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 6
+  datetime   site_id variable             observation iso_week  week
+  &lt;date&gt;     &lt;chr&gt;   &lt;chr&gt;                      &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;
+1 2015-04-20 BLAN    amblyomma_americanum        0    2015-W17    17
+2 2015-05-11 BLAN    amblyomma_americanum        9.82 2015-W20    20
+3 2015-06-01 BLAN    amblyomma_americanum       10    2015-W23    23
+4 2015-06-08 BLAN    amblyomma_americanum       19.4  2015-W24    24
+5 2015-06-22 BLAN    amblyomma_americanum        3.14 2015-W26    26
+6 2015-07-13 BLAN    amblyomma_americanum        3.66 2015-W29    29</code></pre>
+</div>
+</div>
+<ul>
+<li><span class="math inline">X_2</span> Sine wave: We use this to give our model phases. We can consider this as a proxy to some other variables such as temperature which would increase from Jan to about Jun-July and then decrease. We use the following sin wave</li>
+</ul>
+<p><span class="math inline">X_2 = \left( \text{sin} \ \left( \frac{2 \ \pi \ X_1}{106} \right) \right)^2</span> where, <span class="math inline">X_1</span> is the iso-week.</p>
+<p>Usually, a Sin wave for a year would have the periodicity of 53 to indicate 53 weeks. Why have we chosen 106 as our period? And we do we square it?</p>
+<p>Let’s use a visual to understand that.</p>
+<div class="cell page-columns page-full" data-layout-align="center" data-warn.conflicts="false">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">106</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sin_53 <span class="ot">&lt;-</span> <span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span>x<span class="sc">/</span><span class="dv">53</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>sin_106 <span class="ot">&lt;-</span> (<span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span>x<span class="sc">/</span><span class="dv">106</span>))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>sin_106_2 <span class="ot">&lt;-</span> (<span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span>x<span class="sc">/</span><span class="dv">106</span>))<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">1</span>), <span class="at">cex.axis =</span> <span class="dv">2</span>, <span class="at">cex.lab =</span> <span class="dv">2</span>, <span class="at">cex.main =</span> <span class="dv">3</span>, <span class="at">font.lab =</span> <span class="dv">2</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x, sin_53, <span class="at">col =</span> <span class="dv">2</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="at">ylab =</span> <span class="st">"sin wave"</span>, </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(sin,  <span class="st">" "</span>, (<span class="fu">frac</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> X[<span class="dv">1</span>], <span class="dv">53</span>)))))</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x, sin_106, <span class="at">col =</span> <span class="dv">3</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="at">ylab =</span> <span class="st">"sin wave"</span>, </span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(sin,  <span class="st">" "</span>, (<span class="fu">frac</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> X[<span class="dv">1</span>], <span class="dv">106</span>)))))</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x, sin_106_2, <span class="at">col =</span> <span class="dv">4</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="at">ylab =</span> <span class="st">"sin wave"</span>, </span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(sin<span class="sc">^</span><span class="dv">2</span>,  <span class="st">" "</span>, (<span class="fu">frac</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> X[<span class="dv">1</span>], <span class="dv">106</span>)))))</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display page-columns page-full">
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><img src="GP_Practical_files/figure-html/unnamed-chunk-10-1.png" class="column-body img-fluid quarto-figure quarto-figure-center figure-img" width="1440"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Some observations:</p>
+<ul>
+<li><p>The sin wave (period 53) goes increases from (0, 1) and decreases all the way to -1 before coming back to 0, all within the 53 weeks in the year. But this is not what we want to achieve.</p></li>
+<li><p>We want the function to increase from Jan - Jun and then start decreasing till Dec.&nbsp;This means, we need a regular sin-wave to span 2 years so we can see this.</p></li>
+<li><p>We also want the next year to repeat the same pattern i.e.&nbsp;we want to restrict it to [0, 1] interval. Thus, we square the sin wave.</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>fx.sin <span class="ot">&lt;-</span> <span class="cf">function</span>(datetime, <span class="at">f1 =</span> fx.iso_week){</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># identify iso week#</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">f1</span>(datetime) </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># calculate sin value for that week</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  x2 <span class="ot">&lt;-</span> (<span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span>x<span class="sc">/</span><span class="dv">106</span>))<span class="sc">^</span><span class="dv">2</span> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(x2)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For a GP, it’s also useful to ensure that all our X’s are between 0 and 1. Usually this is done by using the following method</p>
+<p><span class="math inline">X_i^* = \frac{X_i - \min(X)}{\max(X) - \min(X) }</span> where <span class="math inline">X = (X_1, X_2 ...X_n)</span></p>
+<p><span class="math inline">X^* = (X_1^*, X_2^* ... X_n^*)</span> will be the standarized <span class="math inline">X</span>’s with all <span class="math inline">X_i^*</span> in the interval [0, 1].</p>
+<p>We can either write a function for this, or in our case, we can just divide Iso-week by 53 since that would result effectively be the same. Our Sin Predictor already lies in the interval [0, 1].</p>
+</section>
+<section id="model-fitting" class="level2">
+<h2 class="anchored" data-anchor-id="model-fitting">Model Fitting</h2>
+<p>Now, let’s start with modelling. We will start with one random location out of the 9 locations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Choose a random site number: Anything between 1-9.</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>site_number <span class="ot">&lt;-</span> <span class="dv">6</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtaining site name</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>site_names <span class="ot">&lt;-</span> <span class="fu">unique</span>(target<span class="sc">$</span>site_id)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Subsetting all the data at that location</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">subset</span>(target, target<span class="sc">$</span>site_id <span class="sc">==</span> site_names[site_number])</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 6
+  datetime   site_id variable             observation iso_week  week
+  &lt;date&gt;     &lt;chr&gt;   &lt;chr&gt;                      &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;
+1 2014-06-09 SCBI    amblyomma_americanum       75.9  2014-W24    24
+2 2014-06-30 SCBI    amblyomma_americanum       28.3  2014-W27    27
+3 2014-07-21 SCBI    amblyomma_americanum        0    2014-W30    30
+4 2014-07-28 SCBI    amblyomma_americanum       10.1  2014-W31    31
+5 2014-08-11 SCBI    amblyomma_americanum        4.94 2014-W33    33
+6 2014-10-20 SCBI    amblyomma_americanum        0    2014-W43    43</code></pre>
+</div>
+</div>
+<p>We will also select only those columns that we are interested in i.e.&nbsp;<code>datetime</code> and <code>obervation</code>. We don’t need site since we are only using one of them.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracting only the datetime and obs columns</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df[, <span class="fu">c</span>(<span class="st">"datetime"</span>, <span class="st">"observation"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We will use one site at first and fit a GP and make predictions. For this we first need to divide our data into a training set and a testing set. Since we have time series, we want to divide the data sequentially, i.e.&nbsp;we pick a date and everything before the date is our training set and after is our testing set where we check how well our model performs. We choose the date <code>2020-12-31</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Selecting a date before which we consider everything as training data and after this is testing data.</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>cutoff <span class="ot">=</span> <span class="fu">as.Date</span>(<span class="st">'2022-12-31'</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>df_train <span class="ot">&lt;-</span> <span class="fu">subset</span>(df, df<span class="sc">$</span>datetime <span class="sc">&lt;=</span> cutoff)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> <span class="fu">subset</span>(df, df<span class="sc">$</span>datetime <span class="sc">&gt;</span> cutoff)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="gp-model" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="gp-model">GP Model</h2>
+<p>Now we will setup our X’s. We already have the functions to do this and can simply pass in the datetime. We then combine <span class="math inline">X_1</span> and <span class="math inline">X_2</span> to create out input matrix <span class="math inline">X</span>. Remember, everything is ordered as in our dataset.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Setting up iso-week and sin wave predictors by calling the functions</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>X1 <span class="ot">&lt;-</span> <span class="fu">fx.iso_week</span>(df_train<span class="sc">$</span>datetime) <span class="co"># range is 1-53</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>X2 <span class="ot">&lt;-</span> <span class="fu">fx.sin</span>(df_train<span class="sc">$</span>datetime) <span class="co"># range is 0 to 1</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Centering the iso-week by diving by 53</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>X1c <span class="ot">&lt;-</span> X1<span class="sc">/</span> <span class="dv">53</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># We combine columns centered X1 and X2, into a matrix as our input space</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">cbind.data.frame</span>(X1c, X2))</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           X1c        X2
+[1,] 0.4528302 0.9782005
+[2,] 0.5094340 0.9991219
+[3,] 0.5660377 0.9575728
+[4,] 0.5849057 0.9305218
+[5,] 0.6226415 0.8587536
+[6,] 0.8113208 0.3120862</code></pre>
+</div>
+</div>
+<p>Next step is to tranform the response to ensure it is normal.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract y: observation from our training model. </span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>y_obs <span class="ot">&lt;-</span> df_train<span class="sc">$</span>observation</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Transform the response</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">f</span>(y_obs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, we can use the <code>laGP</code> library to fit a GP. First, we specify priors using <code>darg</code> and <code>garg</code>. We will specify a minimum and maximum for our arguments. We need to pass the input space for <code>darg</code> and the output vector for <code>garg</code>. You can look into the functions using <code>?function</code> in R. We set the minimum to a very small value rather than 0 to ensure numeric stability.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A very small value for stability</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>eps <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(.Machine<span class="sc">$</span>double.eps) </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Priors for theta and g. </span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">darg</span>(<span class="fu">list</span>(<span class="at">mle=</span><span class="cn">TRUE</span>, <span class="at">min =</span>eps, <span class="at">max=</span><span class="dv">5</span>), X)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">garg</span>(<span class="fu">list</span>(<span class="at">mle=</span><span class="cn">TRUE</span>, <span class="at">min =</span> eps, <span class="at">max =</span> <span class="dv">1</span>), y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, to fit the GP, we use <code>newGPsep</code>. We pass the input matrix and the response vector with some values of the parameters. Then, we use the <code>jmleGPsep</code> function to jointly estimate <span class="math inline">\theta</span> and <span class="math inline">g</span> using MLE method. <code>dK</code> allows the GP object to store derivative information which is needed for MLE calculations. <code>newGPsep</code> will fit a separable GP as opposed to <code>newGP</code> which would fit an isotropic GP.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fitting a GP with our data, and some starting values for theta and g</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>gpi <span class="ot">&lt;-</span> <span class="fu">newGPsep</span>(X, y, <span class="at">d =</span> <span class="fl">0.1</span>, <span class="at">g =</span> <span class="dv">1</span>, <span class="at">dK =</span> T)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Jointly infer MLE for all parameters</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>mle <span class="ot">&lt;-</span> <span class="fu">jmleGPsep</span>(gpi, <span class="at">drange =</span> <span class="fu">c</span>(d<span class="sc">$</span>min, d<span class="sc">$</span>max), <span class="at">grange =</span> <span class="fu">c</span>(g<span class="sc">$</span>min, g<span class="sc">$</span>max), </span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">dab =</span> d<span class="sc">$</span>ab, <span class="at">gab=</span>  g<span class="sc">$</span>ab)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, we will create a grid from the first week in our dataset to 1 year into the future, and predict on the entire time series. We use <code>predGPsep</code> to make predictions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a grid from start date in our data set to one year in future (so we forecast for next season)</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>startdate <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">min</span>(df<span class="sc">$</span>datetime))<span class="co"># identify start week</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>grid_datetime <span class="ot">&lt;-</span> <span class="fu">seq.Date</span>(startdate, <span class="fu">Sys.Date</span>() <span class="sc">+</span> <span class="dv">365</span>, <span class="at">by =</span> <span class="dv">7</span>) <span class="co"># create sequence from </span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Build the input space for the predictive space (All weeks from 04-2014 to 07-2025)</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>XXt1 <span class="ot">&lt;-</span> <span class="fu">fx.iso_week</span>(grid_datetime)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>XXt2 <span class="ot">&lt;-</span> <span class="fu">fx.sin</span>(grid_datetime)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>XXt1c <span class="ot">&lt;-</span> XXt1<span class="sc">/</span><span class="dv">53</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Store inputs as a matrix</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>XXt <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">cbind.data.frame</span>(XXt1c, XXt2))</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Make predictions using predGP with the gp object and the predictive set</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>ppt <span class="ot">&lt;-</span> <span class="fu">predGPsep</span>(gpi, XXt) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Storing the mean and calculating quantiles.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Now we store the mean as our predicted response i.e. density along with quantiles</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>yyt <span class="ot">&lt;-</span> ppt<span class="sc">$</span>mean</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>q1t <span class="ot">&lt;-</span> ppt<span class="sc">$</span>mean <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fl">0.025</span>,<span class="dv">0</span>,<span class="fu">sqrt</span>(<span class="fu">diag</span>(ppt<span class="sc">$</span>Sigma))) <span class="co">#lower bound</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>q2t <span class="ot">&lt;-</span> ppt<span class="sc">$</span>mean <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>,<span class="dv">0</span>,<span class="fu">sqrt</span>(<span class="fu">diag</span>(ppt<span class="sc">$</span>Sigma))) <span class="co"># upper bound</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we can plot our data and predictions and see how well our model performed. We need to back transform our predictions to the original scale.</p>
+<div class="cell page-columns page-full" data-layout-align="center" data-warn.conflicts="false">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Back transform our data to original</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>gp_yy <span class="ot">&lt;-</span> <span class="fu">fi</span>(yyt)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>gp_q1 <span class="ot">&lt;-</span> <span class="fu">fi</span>(q1t)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>gp_q2 <span class="ot">&lt;-</span> <span class="fu">fi</span>(q2t)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the observed points</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">as.Date</span>(df<span class="sc">$</span>datetime), df<span class="sc">$</span>observation,</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">main =</span> <span class="fu">paste</span>(site_names[site_number]), <span class="at">col =</span> <span class="st">"black"</span>,</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"Dates"</span> , <span class="at">ylab =</span> <span class="st">"Abundance"</span>,</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>       <span class="co"># xlim = c(as.Date(min(df$datetime)), as.Date(cutoff)),</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fu">min</span>(df_train<span class="sc">$</span>observation, gp_yy, gp_q1), <span class="fu">max</span>(df_train<span class="sc">$</span>observation, gp_yy, gp_q2)<span class="sc">*</span> <span class="fl">1.05</span>))</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the testing set data </span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(<span class="fu">as.Date</span>(df_test<span class="sc">$</span>datetime), df_test<span class="sc">$</span>observation, <span class="at">col =</span><span class="st">"black"</span>, <span class="at">pch =</span> <span class="dv">19</span>)</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Line to indicate seperation between train and test data</span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="fu">as.Date</span>(cutoff), <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Add the predicted response and the quantiles</span></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(grid_datetime, gp_yy, <span class="at">col =</span> <span class="dv">4</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(grid_datetime, gp_q1, <span class="at">col =</span> <span class="dv">4</span>, <span class="at">lwd =</span> <span class="fl">1.2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(grid_datetime, gp_q2, <span class="at">col =</span> <span class="dv">4</span>, <span class="at">lwd =</span> <span class="fl">1.2</span>, <span class="at">lty =</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display page-columns page-full">
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><img src="GP_Practical_files/figure-html/unnamed-chunk-21-1.png" class="column-body img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>That looks pretty good? We can also look at the RMSE to see how the model performs. It is better o do this on the transformed scale. We will use <code>yyt</code> for this. We need to find those predictions which correspond to the datetime in our testing dataset <code>df_test</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtain true observed values for testing set</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>yt_true <span class="ot">&lt;-</span> <span class="fu">f</span>(df_test<span class="sc">$</span>observation)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># FInd corresponding predictions from our model in the grid we predicted on</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>yt_pred <span class="ot">&lt;-</span> yyt[<span class="fu">which</span>(grid_datetime  <span class="sc">%in%</span> df_test<span class="sc">$</span>datetime)]</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate RMSE</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>rmse <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((yt_true <span class="sc">-</span> yt_pred)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>rmse</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.870971</code></pre>
+</div>
+</div>
+</section>
+<section id="hetgp-model" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="hetgp-model">HetGP Model</h2>
+<p>Next, we can attempt a hetGP. We are now interested in fitting a vector of nuggets rather than a single value.</p>
+<p>Let’s use the same data we have to fit a hetGP. We already have our data <code>(X, y)</code> as well as our prediction set <code>XXt</code>. We use the <code>mleHetGP</code> command to fit a GP and pass in our data. The default covariance structure is the Squared Exponential structure. We use the <code>predict</code> function in base R and pass the hetGP object i.e.&nbsp;<code>het_gpi</code> to make predictions on our set <code>XXt</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create predictors</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>X1 <span class="ot">&lt;-</span> <span class="fu">fx.iso_week</span>(df_train<span class="sc">$</span>datetime)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>X2 <span class="ot">&lt;-</span> <span class="fu">fx.sin</span>(df_train<span class="sc">$</span>datetime)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="co"># standardize and put into matrix</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>X1c <span class="ot">&lt;-</span> X1<span class="sc">/</span><span class="dv">53</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">cbind.data.frame</span>(X1c, X2))</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Build prediction grid (From 04-2014 to 07-2025)</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>XXt1 <span class="ot">&lt;-</span> <span class="fu">fx.iso_week</span>(grid_datetime)</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>XXt2 <span class="ot">&lt;-</span> <span class="fu">fx.sin</span>(grid_datetime)</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="co"># standardize and put into matrix</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>XXt1c <span class="ot">&lt;-</span> XXt1<span class="sc">/</span><span class="dv">53</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>XXt <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">cbind.data.frame</span>(XXt1c, XXt2))</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Transform the training response</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>y_obs <span class="ot">&lt;-</span> df_train<span class="sc">$</span>observation</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">f</span>(y_obs)</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit a hetGP model. X must be s matrix and nrow(X) should be same as length(y)</span></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>het_gpi <span class="ot">&lt;-</span> hetGP<span class="sc">::</span><span class="fu">mleHetGP</span>(<span class="at">X =</span> X, <span class="at">Z =</span> y)</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Predictions using the base R predict command with a hetGP object and new locationss</span></span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>het_ppt <span class="ot">&lt;-</span> <span class="fu">predict</span>(het_gpi, XXt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we obtain the mean and the confidence bounds as well as transform the data to the original scale.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean density for predictive locations and Confidence bounds</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>het_yyt <span class="ot">&lt;-</span> het_ppt<span class="sc">$</span>mean</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>het_q1t <span class="ot">&lt;-</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>, het_ppt<span class="sc">$</span>mean, <span class="fu">sqrt</span>(het_ppt<span class="sc">$</span>sd2 <span class="sc">+</span> het_ppt<span class="sc">$</span>nugs))</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>het_q2t <span class="ot">&lt;-</span> <span class="fu">qnorm</span>(<span class="fl">0.025</span>, het_ppt<span class="sc">$</span>mean, <span class="fu">sqrt</span>(het_ppt<span class="sc">$</span>sd2 <span class="sc">+</span> het_ppt<span class="sc">$</span>nugs)) </span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Back transforming to original scale</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>het_yy <span class="ot">&lt;-</span> <span class="fu">fi</span>(het_yyt)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>het_q1 <span class="ot">&lt;-</span> <span class="fu">fi</span>(het_q1t)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>het_q2 <span class="ot">&lt;-</span> <span class="fu">fi</span>(het_q2t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can now plot the results similar to before. [Uncomment the code lines to see how a GP vs a HetGP fits the data]</p>
+<div class="cell page-columns page-full" data-layout-align="center" data-warn.conflicts="false">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Original data</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">as.Date</span>(df<span class="sc">$</span>datetime), df<span class="sc">$</span>observation,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">main =</span> <span class="fu">paste</span>(site_names[site_number]), <span class="at">col =</span> <span class="st">"black"</span>,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"Dates"</span> , <span class="at">ylab =</span> <span class="st">"Abundance"</span>,</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>       <span class="co"># xlim = c(as.Date(min(df$datetime)), as.Date(cutoff)),</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fu">min</span>(df_train<span class="sc">$</span>observation, het_yy, het_q2), <span class="fu">max</span>(df_train<span class="sc">$</span>observation, het_yy, het_q1)<span class="sc">*</span> <span class="fl">1.2</span>))</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Add testing observations</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(<span class="fu">as.Date</span>(df_test<span class="sc">$</span>datetime), df_test<span class="sc">$</span>observation, <span class="at">col =</span><span class="st">"black"</span>, <span class="at">pch =</span> <span class="dv">19</span>)</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Line to indicate our cutoff point</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="fu">as.Date</span>(cutoff), <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a><span class="co"># HetGP Model mean predictions and bounds.</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(grid_datetime, het_yy, <span class="at">col =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(grid_datetime, het_q1, <span class="at">col =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="fl">1.2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(grid_datetime, het_q2, <span class="at">col =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="fl">1.2</span>, <span class="at">lty =</span><span class="dv">2</span>)</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Train Y"</span>,<span class="st">"Test Y"</span>, <span class="st">"HetGP preds"</span>),</span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, <span class="dv">1</span>),</span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">pch =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">19</span>, <span class="cn">NA</span>), <span class="at">cex =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display page-columns page-full">
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><img src="GP_Practical_files/figure-html/unnamed-chunk-25-1.png" class="column-body img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The mean predictions of a GP are similar to that of a hetGP; But the confidence bounds are different. A hetGP produces sligtly tighter bounds.</p>
+<p>We can also compare the RMSE’s using the predictions of the hetGP model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>yt_true <span class="ot">&lt;-</span> <span class="fu">f</span>(df_test<span class="sc">$</span>observation) <span class="co"># Original data</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>het_yt_pred <span class="ot">&lt;-</span> het_yyt[<span class="fu">which</span>(grid_datetime  <span class="sc">%in%</span> df_test<span class="sc">$</span>datetime)] <span class="co"># model preds</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate rmse for hetGP model</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>rmse_het <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((yt_true <span class="sc">-</span> het_yt_pred)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>rmse_het</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.9062104</code></pre>
+</div>
+</div>
+<p>Now that we have learnt how to fit a GP and a hetGP, it’s time for a challenge.</p>
+<p>Try a hetGP on this example.</p>
+<div class="cell page-columns page-full">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Your turn</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> mcycle<span class="sc">$</span>time</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> mcycle<span class="sc">$</span>accel</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict on this set</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>XX <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">301</span>, <span class="at">length=</span> <span class="dv">200</span>), <span class="at">ncol=</span><span class="dv">1</span>)</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Data visualization</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(X, y, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">150</span>, <span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display page-columns page-full">
+<div class="page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><img src="GP_Practical_files/figure-html/unnamed-chunk-27-1.png" class="column-body img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add code to fit a hetGP model and visualise it as above</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="challenges" class="level1">
+<h1>Challenges</h1>
+<p>Now it’s your turn to try to fit a GP on your own. Here are some options:</p>
+<section id="fit-a-gp-model-for-the-location-serc-i.e.-site_number-7-and-site_number-4" class="level4">
+<h4 class="anchored" data-anchor-id="fit-a-gp-model-for-the-location-serc-i.e.-site_number-7-and-site_number-4">Fit a GP Model for the location “SERC” i.e.&nbsp;<code>site_number = 7</code> and <code>site_number = 4</code></h4>
+</section>
+<section id="fit-a-gp-model-for-all-the-locations" class="level4">
+<h4 class="anchored" data-anchor-id="fit-a-gp-model-for-all-the-locations">Fit a GP Model for all the locations</h4>
+<p>Hint 1: Write a <em>function</em> that can fit a GP and make predictions (keep it simple. Let arguments be the inputs <span class="math inline">X</span>, response <span class="math inline">Y</span> and predictive set <span class="math inline">XX</span>).</p>
+<p>Hint 2: Write a <em>for loop</em> where you subset the data for each location and then call the function to fit the GP.</p>
+</section>
+<section id="build-altitude-predictor-for-the-testing-set-advanced." class="level4">
+<h4 class="anchored" data-anchor-id="build-altitude-predictor-for-the-testing-set-advanced.">Build altitude predictor for the testing set (<em>Advanced</em>).</h4>
+<p>Here is a snippet of the function to build the predictor.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>site_data <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="fu">paste0</span>(<span class="st">"https://raw.githubusercontent.com/eco4cast/neon4cast-targets/"</span>,<span class="st">"main/NEON_Field_Site_Metadata_20220412.csv"</span>)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(ticks <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>site_data <span class="ot">&lt;-</span> site_data <span class="sc">|&gt;</span> dplyr<span class="sc">:::</span><span class="fu">select</span>(field_site_id, field_mean_elevation_m)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(site_data) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"site_id"</span>, <span class="st">"altitude"</span>)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Scaling altitude between [0, 1]</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>site_data<span class="sc">$</span>altitude <span class="ot">&lt;-</span> (site_data<span class="sc">$</span>altitude <span class="sc">-</span> <span class="fu">min</span>(site_data<span class="sc">$</span>altitude))<span class="sc">/</span>(<span class="fu">max</span>(site_data<span class="sc">$</span>altitude) <span class="sc">-</span> <span class="fu">min</span>(site_data<span class="sc">$</span>altitude))</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>fx.alt <span class="ot">&lt;-</span> <span class="cf">function</span>(df, <span class="at">site_df =</span> site_data, <span class="at">test_site =</span> <span class="cn">NULL</span>){</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is.null</span>(test_site)) df <span class="ot">&lt;-</span> <span class="fu">cbind.data.frame</span>(df, <span class="at">site_id =</span> <span class="fu">rep</span>(test_site, <span class="fu">length</span>(df)))</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(site_df, <span class="at">by =</span> <span class="st">"site_id"</span>)</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df<span class="sc">$</span>alt)</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> target[, <span class="fu">c</span>(<span class="st">"datetime"</span>, <span class="st">"site_id"</span>, <span class="st">"observation"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Hints: Follow the layout</p>
+<pre><code># build training set for full dataset.
+x_train &lt;- 
+y_train &lt;- 
+
+## fit model (you only need to fit the model once.)
+  
+# build testing set by location and make predicions
+for(i in __){
+  
+  # Testing set for location (i)
+  x_test &lt;- 
+  y_test &lt;- 
+  
+  # Predict by location
+  
+  # store predictions, training data at this location and bounds
+}
+
+### Visualize the fits by location
+
+for(i in 1:__){
+  
+  #   Plot data at location  
+  
+  #   Plot GP model preds
+}</code></pre>
+<!-- Change colors on plots -->
+<!-- \link{https://projects.ecoforecast.org/neon4cast-docs/Ticks.htmls} -->
+
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-binois2021hetgp" class="csl-entry" role="listitem">
+Binois, Mickaël, and Robert B Gramacy. 2021. <span>“Hetgp: Heteroskedastic Gaussian Process Modeling and Sequential Design in r.”</span> <em>Journal of Statistical Software</em> 98: 1–44.
+</div>
+<div id="ref-laGP" class="csl-entry" role="listitem">
+Gramacy, Robert B. 2016. <span>“<span class="nocase">laGP: Large-Scale Spatial Modeling via Local Approximate Gaussian Processes in R</span>.”</span> <em>Journal of Statistical Software</em> 72 (i01). https://doi.org/<a href="http://hdl.handle.net/10.">http://hdl.handle.net/10.</a>
+</div>
+</div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{vijay_patil,_leah_r._johnson,_robert_b._gramacy2024,
+  author = {Vijay Patil, Leah R. Johnson, Robert B. Gramacy, Parul},
+  title = {Introduction to {Gaussian} {Processes} for {Time} {Dependent}
+    {Data} {(Practical)}},
+  date = {2024-07-21},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-vijay_patil,_leah_r._johnson,_robert_b._gramacy2024" class="csl-entry quarto-appendix-citeas" role="listitem">
+Vijay Patil, Leah R. Johnson, Robert B. Gramacy, Parul. 2024.
+<span>“Introduction to Gaussian Processes for Time Dependent Data
+(Practical).”</span> July 21, 2024.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
