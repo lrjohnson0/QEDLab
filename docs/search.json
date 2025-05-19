@@ -126,6 +126,55 @@
     "text": "Paper introducing bayesTPC is out in Methods in Ecology and Evolution\n\n\n\nnews\n\nsoftware\n\nbayesTPC\n\n\n\n\n\n\n\n\n\nApr 11, 2025\n\n\nLeah R Johnson\n\n\n\n\n\n\n\n\n\n\n\n\nReflections from the 2023 VectorByte Training Workshop\n\n\n\nnews\n\nVectorByte\n\ntraining\n\n\n\n\n\n\n\n\n\nJun 7, 2024\n\n\nAlicia Arneson, Paul Huxley, and Piper Zimmerman\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome to our New Quarto Website\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nMay 24, 2024\n\n\nLeah R Johnson\n\n\n\n\n\nNo matching items"
   },
   {
+    "objectID": "training/EFI2025/GP_Practical.html",
+    "href": "training/EFI2025/GP_Practical.html",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data (Practical)",
+    "section": "",
+    "text": "This practical will lead you through fitting a few versions of GPs using two R packages: laGP (Gramacy 2016) and hetGP (Binois and Gramacy 2021). We will begin with a toy example from the lecture and then move on to a real data example to forecast tick abundances for a NEON site."
+  },
+  {
+    "objectID": "training/EFI2025/GP_Practical.html#overview-of-the-data",
+    "href": "training/EFI2025/GP_Practical.html#overview-of-the-data",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data (Practical)",
+    "section": "Overview of the Data",
+    "text": "Overview of the Data\n\nObjective: Forecast tick density for 4 weeks into the future\nSites: The data is collected across 9 different sites, each plot was of size 1600m^2 using a drag cloth\nData: Sparse and irregularly spaced. We only have ~650 observations across 10 years at 9 locations\n\nLet’s start with loading all the libraries that we will need, load our data and understand what we have.\n\nlibrary(tidyverse)\nlibrary(laGP)\nlibrary(ggplot2)\n\n# Pulling the data from the NEON data base. \ntarget &lt;- readr::read_csv(\"https://data.ecoforecast.org/neon4cast-targets/ticks/ticks-targets.csv.gz\", guess_max = 1e1)\n\n# Visualizing the data\nhead(target)\n\n# A tibble: 6 × 5\n  datetime   site_id variable             observation iso_week\n  &lt;date&gt;     &lt;chr&gt;   &lt;chr&gt;                      &lt;dbl&gt; &lt;chr&gt;   \n1 2015-04-20 BLAN    amblyomma_americanum        0    2015-W17\n2 2015-05-11 BLAN    amblyomma_americanum        9.82 2015-W20\n3 2015-06-01 BLAN    amblyomma_americanum       10    2015-W23\n4 2015-06-08 BLAN    amblyomma_americanum       19.4  2015-W24\n5 2015-06-22 BLAN    amblyomma_americanum        3.14 2015-W26\n6 2015-07-13 BLAN    amblyomma_americanum        3.66 2015-W29"
+  },
+  {
+    "objectID": "training/EFI2025/GP_Practical.html#initial-setup",
+    "href": "training/EFI2025/GP_Practical.html#initial-setup",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data (Practical)",
+    "section": "Initial Setup",
+    "text": "Initial Setup\n\nFor a GP model, we assume the response (Y) should be normally distributed.\nSince tick density, our response, must be greater than 0, we need to use a transform.\nThe following is the most suitable transform for our application:\n\n\n\\begin{equation}\n\\begin{aligned}\nf(y) & = \\log (y + 1) \\\\[2pt]\n\\end{aligned}\n\\end{equation}\nWe pass in (response + 1) into this function to ensure we don’t take a log of 0. We will adjust this in our back transform.\nLet’s write a function for this, as well as the inverse of the transform.\n\n# transforms y\nf &lt;- function(x) {\n  y &lt;- log(x + 1)\n  return(y)\n}\n\n# This function back transforms the input argument\nfi &lt;- function(y) {\n  x &lt;- exp(y) - 1\n  return(x)\n}"
+  },
+  {
+    "objectID": "training/EFI2025/GP_Practical.html#predictors",
+    "href": "training/EFI2025/GP_Practical.html#predictors",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data (Practical)",
+    "section": "Predictors",
+    "text": "Predictors\n\nThe goal is to forecast tick populations for a season so our response (Y) here, is the tick density. However, we do not have a traditional data set with an obvious input space. What is the X? \n\nWe made a few plots earlier to help us identify what can be useful:\n\nX_1 Iso-week: This is the iso-week number\nLet’s convert the iso-week from our target dataset as a numeric i.e. a number. Here is a function to do the same.\n\n# This function tells us the iso-week number given the date\nfx.iso_week &lt;- function(datetime){\n  # Gives ISO-week in the format yyyy-w## and we extract the ##\n  x1 &lt;- as.numeric(stringr::str_sub(ISOweek::ISOweek(datetime), 7, 8)) # find iso week #\n  return(x1)\n}\n\ntarget$week &lt;- fx.iso_week(target$datetime)\nhead(target)\n\n# A tibble: 6 × 6\n  datetime   site_id variable             observation iso_week  week\n  &lt;date&gt;     &lt;chr&gt;   &lt;chr&gt;                      &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;\n1 2015-04-20 BLAN    amblyomma_americanum        0    2015-W17    17\n2 2015-05-11 BLAN    amblyomma_americanum        9.82 2015-W20    20\n3 2015-06-01 BLAN    amblyomma_americanum       10    2015-W23    23\n4 2015-06-08 BLAN    amblyomma_americanum       19.4  2015-W24    24\n5 2015-06-22 BLAN    amblyomma_americanum        3.14 2015-W26    26\n6 2015-07-13 BLAN    amblyomma_americanum        3.66 2015-W29    29\n\n\n\nX_2 Sine wave: We use this to give our model phases. We can consider this as a proxy to some other variables such as temperature which would increase from Jan to about Jun-July and then decrease. We use the following sin wave\n\nX_2 = \\left( \\text{sin} \\ \\left( \\frac{2 \\ \\pi \\ X_1}{106} \\right) \\right)^2 where, X_1 is the iso-week.\nUsually, a Sin wave for a year would have the periodicity of 53 to indicate 53 weeks. Why have we chosen 106 as our period? And we do we square it?\nLet’s use a visual to understand that.\n\nx &lt;- c(1:106)\nsin_53 &lt;- sin(2*pi*x/53)\nsin_106 &lt;- (sin(2*pi*x/106))\nsin_106_2 &lt;- (sin(2*pi*x/106))^2\n\npar(mfrow=c(1, 3), mar = c(4, 5, 7, 1), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)\nplot(x, sin_53, col = 2, pch = 19, ylim = c(-1, 1), ylab = \"sin wave\", \n     main = expression(paste(sin,  \" \", (frac(2 * pi * X[1], 53)))))\nabline(h = 0, lwd = 2)\nplot(x, sin_106, col = 3, pch = 19, ylim = c(-1, 1), ylab = \"sin wave\", \n     main = expression(paste(sin,  \" \", (frac(2 * pi * X[1], 106)))))\nabline(h = 0, lwd = 2)\nplot(x, sin_106_2, col = 4, pch = 19, ylim = c(-1, 1), ylab = \"sin wave\", \n     main = expression(paste(sin^2,  \" \", (frac(2 * pi * X[1], 106)))))\nabline(h = 0, lwd = 2)\n\n\n\n\n\n\n\n\nSome observations:\n\nThe sin wave (period 53) goes increases from (0, 1) and decreases all the way to -1 before coming back to 0, all within the 53 weeks in the year. But this is not what we want to achieve.\nWe want the function to increase from Jan - Jun and then start decreasing till Dec. This means, we need a regular sin-wave to span 2 years so we can see this.\nWe also want the next year to repeat the same pattern i.e. we want to restrict it to [0, 1] interval. Thus, we square the sin wave.\n\n\nfx.sin &lt;- function(datetime, f1 = fx.iso_week){\n  # identify iso week#\n  x &lt;- f1(datetime) \n  # calculate sin value for that week\n  x2 &lt;- (sin(2*pi*x/106))^2 \n  return(x2)\n}\n\nFor a GP, it’s also useful to ensure that all our X’s are between 0 and 1. Usually this is done by using the following method\nX_i^* = \\frac{X_i - \\min(X)}{\\max(X) - \\min(X) } where X = (X_1, X_2 ...X_n)\nX^* = (X_1^*, X_2^* ... X_n^*) will be the standarized X’s with all X_i^* in the interval [0, 1].\nWe can either write a function for this, or in our case, we can just divide Iso-week by 53 since that would result effectively be the same. Our Sin Predictor already lies in the interval [0, 1]."
+  },
+  {
+    "objectID": "training/EFI2025/GP_Practical.html#model-fitting",
+    "href": "training/EFI2025/GP_Practical.html#model-fitting",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data (Practical)",
+    "section": "Model Fitting",
+    "text": "Model Fitting\nNow, let’s start with modelling. We will start with one random location out of the 9 locations.\n\n# Choose a random site number: Anything between 1-9.\nsite_number &lt;- 6\n\n# Obtaining site name\nsite_names &lt;- unique(target$site_id)\n\n# Subsetting all the data at that location\ndf &lt;- subset(target, target$site_id == site_names[site_number])\nhead(df)\n\n# A tibble: 6 × 6\n  datetime   site_id variable             observation iso_week  week\n  &lt;date&gt;     &lt;chr&gt;   &lt;chr&gt;                      &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;\n1 2014-06-09 SCBI    amblyomma_americanum       75.9  2014-W24    24\n2 2014-06-30 SCBI    amblyomma_americanum       28.3  2014-W27    27\n3 2014-07-21 SCBI    amblyomma_americanum        0    2014-W30    30\n4 2014-07-28 SCBI    amblyomma_americanum       10.1  2014-W31    31\n5 2014-08-11 SCBI    amblyomma_americanum        4.94 2014-W33    33\n6 2014-10-20 SCBI    amblyomma_americanum        0    2014-W43    43\n\n\nWe will also select only those columns that we are interested in i.e. datetime and obervation. We don’t need site since we are only using one of them.\n\n# extracting only the datetime and obs columns\ndf &lt;- df[, c(\"datetime\", \"observation\")]\n\nWe will use one site at first and fit a GP and make predictions. For this we first need to divide our data into a training set and a testing set. Since we have time series, we want to divide the data sequentially, i.e. we pick a date and everything before the date is our training set and after is our testing set where we check how well our model performs. We choose the date 2020-12-31.\n\n# Selecting a date before which we consider everything as training data and after this is testing data.\ncutoff = as.Date('2022-12-31')\ndf_train &lt;- subset(df, df$datetime &lt;= cutoff)\ndf_test &lt;- subset(df, df$datetime &gt; cutoff)"
+  },
+  {
+    "objectID": "training/EFI2025/GP_Practical.html#gp-model",
+    "href": "training/EFI2025/GP_Practical.html#gp-model",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data (Practical)",
+    "section": "GP Model",
+    "text": "GP Model\nNow we will setup our X’s. We already have the functions to do this and can simply pass in the datetime. We then combine X_1 and X_2 to create out input matrix X. Remember, everything is ordered as in our dataset.\n\n# Setting up iso-week and sin wave predictors by calling the functions\nX1 &lt;- fx.iso_week(df_train$datetime) # range is 1-53\nX2 &lt;- fx.sin(df_train$datetime) # range is 0 to 1\n\n# Centering the iso-week by diving by 53\nX1c &lt;- X1/ 53\n\n# We combine columns centered X1 and X2, into a matrix as our input space\nX &lt;- as.matrix(cbind.data.frame(X1c, X2))\nhead(X)\n\n           X1c        X2\n[1,] 0.4528302 0.9782005\n[2,] 0.5094340 0.9991219\n[3,] 0.5660377 0.9575728\n[4,] 0.5849057 0.9305218\n[5,] 0.6226415 0.8587536\n[6,] 0.8113208 0.3120862\n\n\nNext step is to tranform the response to ensure it is normal.\n\n# Extract y: observation from our training model. \ny_obs &lt;- df_train$observation\n\n# Transform the response\ny &lt;- f(y_obs)\n\nNow, we can use the laGP library to fit a GP. First, we specify priors using darg and garg. We will specify a minimum and maximum for our arguments. We need to pass the input space for darg and the output vector for garg. You can look into the functions using ?function in R. We set the minimum to a very small value rather than 0 to ensure numeric stability.\n\n# A very small value for stability\neps &lt;- sqrt(.Machine$double.eps) \n  \n# Priors for theta and g. \nd &lt;- darg(list(mle=TRUE, min =eps, max=5), X)\ng &lt;- garg(list(mle=TRUE, min = eps, max = 1), y)\n\nNow, to fit the GP, we use newGPsep. We pass the input matrix and the response vector with some values of the parameters. Then, we use the jmleGPsep function to jointly estimate \\theta and g using MLE method. dK allows the GP object to store derivative information which is needed for MLE calculations. newGPsep will fit a separable GP as opposed to newGP which would fit an isotropic GP.\n\n# Fitting a GP with our data, and some starting values for theta and g\ngpi &lt;- newGPsep(X, y, d = 0.1, g = 1, dK = T)\n\n# Jointly infer MLE for all parameters\nmle &lt;- jmleGPsep(gpi, drange = c(d$min, d$max), grange = c(g$min, g$max), \n                 dab = d$ab, gab=  g$ab)\n\nNow, we will create a grid from the first week in our dataset to 1 year into the future, and predict on the entire time series. We use predGPsep to make predictions.\n\n# Create a grid from start date in our data set to one year in future (so we forecast for next season)\nstartdate &lt;- as.Date(min(df$datetime))# identify start week\ngrid_datetime &lt;- seq.Date(startdate, Sys.Date() + 365, by = 7) # create sequence from \n\n# Build the input space for the predictive space (All weeks from 04-2014 to 07-2025)\nXXt1 &lt;- fx.iso_week(grid_datetime)\nXXt2 &lt;- fx.sin(grid_datetime)\n\n# Standardize\nXXt1c &lt;- XXt1/53\n\n# Store inputs as a matrix\nXXt &lt;- as.matrix(cbind.data.frame(XXt1c, XXt2))\n\n# Make predictions using predGP with the gp object and the predictive set\nppt &lt;- predGPsep(gpi, XXt) \n\nStoring the mean and calculating quantiles.\n\n# Now we store the mean as our predicted response i.e. density along with quantiles\nyyt &lt;- ppt$mean\nq1t &lt;- ppt$mean + qnorm(0.025,0,sqrt(diag(ppt$Sigma))) #lower bound\nq2t &lt;- ppt$mean + qnorm(0.975,0,sqrt(diag(ppt$Sigma))) # upper bound\n\nNow we can plot our data and predictions and see how well our model performed. We need to back transform our predictions to the original scale.\n\n# Back transform our data to original\ngp_yy &lt;- fi(yyt)\ngp_q1 &lt;- fi(q1t)\ngp_q2 &lt;- fi(q2t)\n\n# Plot the observed points\nplot(as.Date(df$datetime), df$observation,\n       main = paste(site_names[site_number]), col = \"black\",\n       xlab = \"Dates\" , ylab = \"Abundance\",\n       # xlim = c(as.Date(min(df$datetime)), as.Date(cutoff)),\n       ylim = c(min(df_train$observation, gp_yy, gp_q1), max(df_train$observation, gp_yy, gp_q2)* 1.05))\n\n# Plot the testing set data \npoints(as.Date(df_test$datetime), df_test$observation, col =\"black\", pch = 19)\n\n# Line to indicate seperation between train and test data\nabline(v = as.Date(cutoff), lwd = 2)\n\n# Add the predicted response and the quantiles\nlines(grid_datetime, gp_yy, col = 4, lwd = 2)\nlines(grid_datetime, gp_q1, col = 4, lwd = 1.2, lty = 2)\nlines(grid_datetime, gp_q2, col = 4, lwd = 1.2, lty =2)\n\n\n\n\n\n\n\n\nThat looks pretty good? We can also look at the RMSE to see how the model performs. It is better o do this on the transformed scale. We will use yyt for this. We need to find those predictions which correspond to the datetime in our testing dataset df_test.\n\n# Obtain true observed values for testing set\nyt_true &lt;- f(df_test$observation)\n\n# FInd corresponding predictions from our model in the grid we predicted on\nyt_pred &lt;- yyt[which(grid_datetime  %in% df_test$datetime)]\n\n# calculate RMSE\nrmse &lt;- sqrt(mean((yt_true - yt_pred)^2))\nrmse\n\n[1] 0.870971"
+  },
+  {
+    "objectID": "training/EFI2025/GP_Practical.html#hetgp-model",
+    "href": "training/EFI2025/GP_Practical.html#hetgp-model",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data (Practical)",
+    "section": "HetGP Model",
+    "text": "HetGP Model\nNext, we can attempt a hetGP. We are now interested in fitting a vector of nuggets rather than a single value.\nLet’s use the same data we have to fit a hetGP. We already have our data (X, y) as well as our prediction set XXt. We use the mleHetGP command to fit a GP and pass in our data. The default covariance structure is the Squared Exponential structure. We use the predict function in base R and pass the hetGP object i.e. het_gpi to make predictions on our set XXt.\n\n# create predictors\nX1 &lt;- fx.iso_week(df_train$datetime)\nX2 &lt;- fx.sin(df_train$datetime)\n\n# standardize and put into matrix\nX1c &lt;- X1/53\nX &lt;- as.matrix(cbind.data.frame(X1c, X2))\n\n# Build prediction grid (From 04-2014 to 07-2025)\nXXt1 &lt;- fx.iso_week(grid_datetime)\nXXt2 &lt;- fx.sin(grid_datetime)\n\n# standardize and put into matrix\nXXt1c &lt;- XXt1/53\nXXt &lt;- as.matrix(cbind.data.frame(XXt1c, XXt2))\n\n# Transform the training response\ny_obs &lt;- df_train$observation\ny &lt;- f(y_obs)\n\n# Fit a hetGP model. X must be s matrix and nrow(X) should be same as length(y)\nhet_gpi &lt;- hetGP::mleHetGP(X = X, Z = y)\n\n# Predictions using the base R predict command with a hetGP object and new locationss\nhet_ppt &lt;- predict(het_gpi, XXt)\n\nNow we obtain the mean and the confidence bounds as well as transform the data to the original scale.\n\n# Mean density for predictive locations and Confidence bounds\nhet_yyt &lt;- het_ppt$mean\nhet_q1t &lt;- qnorm(0.975, het_ppt$mean, sqrt(het_ppt$sd2 + het_ppt$nugs))\nhet_q2t &lt;- qnorm(0.025, het_ppt$mean, sqrt(het_ppt$sd2 + het_ppt$nugs)) \n\n# Back transforming to original scale\nhet_yy &lt;- fi(het_yyt)\nhet_q1 &lt;- fi(het_q1t)\nhet_q2 &lt;- fi(het_q2t)\n\nWe can now plot the results similar to before. [Uncomment the code lines to see how a GP vs a HetGP fits the data]\n\n# Plot Original data\nplot(as.Date(df$datetime), df$observation,\n       main = paste(site_names[site_number]), col = \"black\",\n       xlab = \"Dates\" , ylab = \"Abundance\",\n       # xlim = c(as.Date(min(df$datetime)), as.Date(cutoff)),\n       ylim = c(min(df_train$observation, het_yy, het_q2), max(df_train$observation, het_yy, het_q1)* 1.2))\n\n# Add testing observations\npoints(as.Date(df_test$datetime), df_test$observation, col =\"black\", pch = 19)\n\n# Line to indicate our cutoff point\nabline(v = as.Date(cutoff), lwd = 2)\n\n# HetGP Model mean predictions and bounds.\nlines(grid_datetime, het_yy, col = 2, lwd = 2)\nlines(grid_datetime, het_q1, col = 2, lwd = 1.2, lty = 2)\nlines(grid_datetime, het_q2, col = 2, lwd = 1.2, lty =2)\n\nlegend(\"topleft\", legend = c(\"Train Y\",\"Test Y\", \"HetGP preds\"),\n         col = c(1, 1, 2), lty = c(NA, NA, 1),\n         pch = c(1, 19, NA), cex = 0.5)\n\n\n\n\n\n\n\n\nThe mean predictions of a GP are similar to that of a hetGP; But the confidence bounds are different. A hetGP produces sligtly tighter bounds.\nWe can also compare the RMSE’s using the predictions of the hetGP model.\n\nyt_true &lt;- f(df_test$observation) # Original data\nhet_yt_pred &lt;- het_yyt[which(grid_datetime  %in% df_test$datetime)] # model preds\n\n# calculate rmse for hetGP model\nrmse_het &lt;- sqrt(mean((yt_true - het_yt_pred)^2))\nrmse_het\n\n[1] 0.9062104\n\n\nNow that we have learnt how to fit a GP and a hetGP, it’s time for a challenge.\nTry a hetGP on this example.\n\n# Your turn\nX &lt;- mcycle$time\ny &lt;- mcycle$accel\n\n# Predict on this set\nXX &lt;- matrix(seq(0, 301, length= 200), ncol=1)\n\n# Data visualization\nplot(X, y, ylim = c(-150, 100))\n\n\n\n\n\n\n\n# Add code to fit a hetGP model and visualise it as above"
+  },
+  {
     "objectID": "opps.html",
     "href": "opps.html",
     "title": "Opportunities",
@@ -231,6 +280,209 @@
     "text": "Major Projects\nVectorBiTE RCN | US PI\nVectorByte Initiative | PI\nEcological Forecasting Initiative RCN | Steering Committee"
   },
   {
+    "objectID": "training/EFI2025/GP.html#outline",
+    "href": "training/EFI2025/GP.html#outline",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Outline",
+    "text": "Outline\nWe will go through the following topics:\n\nMotivation as Ecologists\nIntroducing Gaussian Processes (GPs)\nHyper-Parameters in GPs\nFitting a GP with some code\nHeteroskedastic GPs (HetGPs)\nFitting a HetGP with some code\nMotivating Ecological Example: Hands-On Practice"
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#time-depedent-data",
+    "href": "training/EFI2025/GP.html#time-depedent-data",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Time-Depedent Data",
+    "text": "Time-Depedent Data\n\n\n\nIn ecology, we often have data with features such as:\n\nSparse and irregularly sampled time series (Time-Dependent Data).\nVaries from location to location.\nOften consists of several noisy observations due to sampling errors."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#gaussian-process-introduction",
+    "href": "training/EFI2025/GP.html#gaussian-process-introduction",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Gaussian Process: Introduction",
+    "text": "Gaussian Process: Introduction\n\n\nGaussian Process (GP) models are non paramteric and flexible regression model.\nExcellent for uncertainty quantification (UQ).\nSuppose we have n observations Y_n corresponding to X_n inputs, then\n\nY_{n} \\sim N (\\mu, \\Sigma_n)\n\nWe wish to estimate the response at a new input X_p i.e. Y_p \\mid Y_n, X_n.\nNote: If you set \\mu = X \\beta and \\Sigma_n = \\sigma^2 \\mathbb{I}, we have a Linear Regression (LR) Setup."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#distance",
+    "href": "training/EFI2025/GP.html#distance",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Distance",
+    "text": "Distance\n\nFor a GP, the covariance matrix, \\Sigma_n is defined by a distance based kernel.\nConsider,\n\n\\Sigma_n = \\tau^2 C_n \\quad \\text{where} \\quad C_n^{ij} = \\exp \\left( - \\vert \\vert x_i - x_j \\vert \\vert^2 \\right)\n\n\nThe covariance structure now depends on how close together the inputs.\nThe covariance will decay at an exponential rate as x moves away from x'."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#visualizing-a-gp",
+    "href": "training/EFI2025/GP.html#visualizing-a-gp",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Visualizing a GP",
+    "text": "Visualizing a GP"
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#predictions-using-the-data",
+    "href": "training/EFI2025/GP.html#predictions-using-the-data",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Predictions using the Data",
+    "text": "Predictions using the Data\n\nWe wish to find \\mathcal{Y} \\vert X_n, Y_n and we know Y_n \\vert X_n \\sim \\mathcal{N}( 0, \\Sigma_n).\nFirst we will “stack” the predictions and the data.\n\n\\begin{equation*}\n\\begin{bmatrix}\n\\mathcal{Y} \\\\\nY_n \\\\\n\\end{bmatrix}\n\\ \\sim \\ \\mathcal{N}\n\\left(\n\\;\n\\begin{bmatrix}\n0 \\\\\n0 \\\\\n\\end{bmatrix}\\; , \\;\n\\begin{bmatrix}\n\\Sigma(\\mathcal{X}, \\mathcal{X}) & \\Sigma(\\mathcal{X}, X_n)\\\\\n\\Sigma({X_n, \\mathcal{X}}) &  \\Sigma_n\\\\\n\\end{bmatrix}\n\\;\n\\right)\n\\end{equation*}\n\nBy properties of Normal distribution, \\mathcal{Y} \\vert X_n, Y_n is also normally distributed.\nWe can notate this as:\n\n\\begin{equation*}\n\\begin{aligned}\n\\mathcal{Y} \\mid Y_n, X_n \\sim \\mathcal{N} \\left(\\mu(\\mathcal{X}),  \\sigma^2(\\mathcal{X})\\right)\n\\end{aligned}\n\\end{equation*}"
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#distribution-of-interest",
+    "href": "training/EFI2025/GP.html#distribution-of-interest",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Distribution of Interest!",
+    "text": "Distribution of Interest!\n\n\nWe will apply the properties of conditional Normal distributions.\n\n\\begin{equation*}\n\\begin{aligned}\n\\mu(\\mathcal{X}) & = \\Sigma(\\mathcal{X}, X_n) \\Sigma_n^{-1} Y_n \\\\[10pt]  \n\\sigma^2(\\mathcal{X}) & = \\Sigma(\\mathcal{X}, \\mathcal{X}) - \\Sigma(\\mathcal{X}, X_n) \\Sigma_n^{-1} \\Sigma(X_n, \\mathcal{X}) \\\\\n\\end{aligned}\n\\end{equation*}\n\n\n\nEverything we do, relies on these equations.\nWe need to focus on \\Sigma so we can tune our GP appropriately."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#sigma-matrix",
+    "href": "training/EFI2025/GP.html#sigma-matrix",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Sigma Matrix",
+    "text": "Sigma Matrix\n\n\n\\Sigma_n = \\tau^2 \\left( C_{\\theta}(X_n) + g \\mathbb{I_n} \\right) where C_n is our kernel.\n\n\n\n\nOne of the most common kernels which we will focus on is the squared exponential distance kernel written as\n\nC_\\theta(x, x') = \\exp{ \\left( -\\frac{\\vert\\vert x - x' \\vert \\vert ^2}{\\theta} \\right ) }\n\n\n\nWhat’s \\tau^2, g and \\theta though? No more math. We will just conceptually go through these"
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#hyper-parameters",
+    "href": "training/EFI2025/GP.html#hyper-parameters",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Hyper Parameters",
+    "text": "Hyper Parameters\n\nA GP is non parameteric, however, has some hyper-parameters. In this case,\n\n\\tau^2 (Scale): This parameter can be used to adjust the amplitude of the data.\n\\theta (Length-scale): This parameter controls the rate of decay of correlation.\ng (Nugget): This parameter controls the noise in the covariance structure (adds discontinuity)\n\nThese hyper-parameters \\{ \\tau^2, \\theta, g \\} are inferred using MLE/Bayesian schemes."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#scale-amplitude",
+    "href": "training/EFI2025/GP.html#scale-amplitude",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Scale (Amplitude)",
+    "text": "Scale (Amplitude)\n\n\nA random draw from a multivariate normal distribution with \\tau^2 = 1 will produce data between -2 and 2.\nNow let’s visualize what happens when we increase \\tau^2 to 25."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#length-scale-rate-of-decay-of-correlation",
+    "href": "training/EFI2025/GP.html#length-scale-rate-of-decay-of-correlation",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Length-scale (Rate of decay of correlation)",
+    "text": "Length-scale (Rate of decay of correlation)\n\n\nDetermines how “wiggly” a function is\nSmaller \\theta means wigglier functions i.e. visually:"
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#nugget-noise",
+    "href": "training/EFI2025/GP.html#nugget-noise",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Nugget (Noise)",
+    "text": "Nugget (Noise)\n\n\nEnsures discontinuity and prevents interpolation which in turn yields better UQ.\nWe will compare a sample from g ~ 0 (&lt; 1e-8 for numeric stability) vs g = 0.1 to observe what actually happens."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#toy-example-1d-example",
+    "href": "training/EFI2025/GP.html#toy-example-1d-example",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Toy Example (1D Example)",
+    "text": "Toy Example (1D Example)\n\n\n\n\n\nX &lt;- matrix(seq(0, 2*pi, length = 100), ncol =1)\nn &lt;- nrow(X) \ntrue_y &lt;- 5 * sin(X)\nobs_y &lt;- true_y + rnorm(n, sd=1)\n\nXX &lt;- matrix(seq(0, 2*pi, length = 200), ncol =1)"
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#toy-example-1d-example-1",
+    "href": "training/EFI2025/GP.html#toy-example-1d-example-1",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Toy Example (1D Example)",
+    "text": "Toy Example (1D Example)\n\n\n\n\neps &lt;- sqrt(.Machine$double.eps)\n\n# Fit GP\ngpi &lt;- newGP(X = X, Z = obs_y, d = 0.1, \n        g = 0.1 * var(obs_y), dK = TRUE)\n\n# Obtain MLE\nmle &lt;- mleGP(gpi = gpi, param = c(\"d\", \"g\"),\n        tmin= c(eps, eps), tmax= c(10, var(obs_y)))\n\n# Make Predictions\np &lt;- predGP(gpi = gpi, XX = XX)"
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#toy-example-1d-example-2",
+    "href": "training/EFI2025/GP.html#toy-example-1d-example-2",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Toy Example (1D Example)",
+    "text": "Toy Example (1D Example)\n\n\n\n\neps &lt;- sqrt(.Machine$double.eps)\n\n# Fit GP\ngpi &lt;- newGP(X = X, Z = obs_y, d = 0.1, \n        g = 0.1 * var(obs_y), dK = TRUE)\n\n# Obtain MLE\nmle &lt;- mleGP(gpi = gpi, param = c(\"d\", \"g\"),\n        tmin= c(eps, eps), tmax= c(10, var(obs_y)))\n\n# Make Predictions\np &lt;- predGP(gpi = gpi, XX = XX)\n\nmean_gp &lt;- p$mean\ns2_gp &lt;- diag(p$Sigma)"
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#extentions-anisotropic-gaussian-processes",
+    "href": "training/EFI2025/GP.html#extentions-anisotropic-gaussian-processes",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Extentions: Anisotropic Gaussian Processes",
+    "text": "Extentions: Anisotropic Gaussian Processes\n\nSuppose we have a d dimensional input space, X_{n \\times d}. We can have one length-scale for each dimension i.e. \\mathbf{\\theta} = \\{ \\theta_1, \\dots, \\theta_d \\}.\nIn this situation, we can rewrite the C_n matrix as,\n\nC_\\theta(x , x') = \\exp{ \\left( -\\sum_{k=1}^{d} \\frac{ (x_k - x_k')^2 }{\\theta_k} \\right )}\n\nThis is also called a Seperable GP\nWe will explore newGPsep, mleGPsep and predGPsep."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#tick-populations-ornl",
+    "href": "training/EFI2025/GP.html#tick-populations-ornl",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Tick Populations: ORNL",
+    "text": "Tick Populations: ORNL\n\n\n\n\n\n\nIso-week (c)\nPeriodicity\nTransformed Density\n\n\n\n\n2014-06-23\n0.49\n1.00\n5.72\n\n\n2014-07-14\n0.55\n0.98\n5.18\n\n\n2015-05-04\n0.36\n0.82\n3.51\n\n\n\n\n\n\n\n\n\n\n# Fitting the GP\ngpi &lt;- newGPsep(X, y, d = 0.1, \n          g = 0.1 * var(y), dK = T)\n\n# Calculating MLEs jointly\nmle &lt;- mleGPsep(gpi)\n\n# Predictions\nppt &lt;- predGPsep(gpi, XXt)"
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#tick-populations-ornl-1",
+    "href": "training/EFI2025/GP.html#tick-populations-ornl-1",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Tick Populations: ORNL",
+    "text": "Tick Populations: ORNL\n\n\n\n\n\n\nIso-week (c)\nPeriodicity\nTransformed Density\n\n\n\n\n2014-06-23\n0.49\n1.00\n5.72\n\n\n2014-07-14\n0.55\n0.98\n5.18\n\n\n2015-05-04\n0.36\n0.82\n3.51\n\n\n\n\n\n\n\n\n\n# Fitting the GP\n#| code-line-numbers: \"|9|\"\ngpi &lt;- newGPsep(X, y, d = 0.1, \n          g = 0.1 * var(y), dK = T)\n\n# Calculating MLEs jointly\nmle &lt;- mleGPsep(gpi)\n\n# Predictions\nppt &lt;- predGPsep(gpi, XXt)"
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#extension-heteroskedastic-gps-hetgp",
+    "href": "training/EFI2025/GP.html#extension-heteroskedastic-gps-hetgp",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Extension: Heteroskedastic GPs (HetGP)",
+    "text": "Extension: Heteroskedastic GPs (HetGP)\n\nSuppose we have noise is input dependent (Binois, Gramacy, and Ludkovski 2018)."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#extension-heteroskedastic-gps-hetgp-1",
+    "href": "training/EFI2025/GP.html#extension-heteroskedastic-gps-hetgp-1",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Extension: Heteroskedastic GPs (HetGP)",
+    "text": "Extension: Heteroskedastic GPs (HetGP)\n\nSuppose we have noise is input dependent (Binois, Gramacy, and Ludkovski 2018).\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nWe can use a different nugget for each unique input rather than a scalar g."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#hetgp-setup",
+    "href": "training/EFI2025/GP.html#hetgp-setup",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "HetGP Setup",
+    "text": "HetGP Setup\n\nLet X_n, Y_n be the data and \\mathbf{\\lambda_n} be the noise level at input X_n.\nIn case of a hetGP, we have:\n\n\n\\begin{align*}\nY_n & \\sim GP \\left( 0, \\tau^2 \\left( C_{\\theta_Y}(X_n)  + \\Lambda_n \\right)  \\right) \\quad \\text{where,} \\quad \\Lambda_n = \\text{Diag}(\\bold{\\lambda}_n);\\\\\n\\log \\bold{\\lambda}_n & \\sim GP \\left( 0, \\tau_\\lambda^2 C_{\\theta_\\lambda}(X_n)  \\right)\\\\\n\\end{align*}\n\n\nNote that in a regular GP: \\Lambda_n = g \\mathbb{I}_n. We average over the noise across the input space.\nWe must infer \\{ \\bold{\\lambda}_n, \\theta_Y, \\theta_\\lambda, \\tau^2, \\tau^2_\\lambda \\} using MLE/Bayesian schemes."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#hetgp-predictions",
+    "href": "training/EFI2025/GP.html#hetgp-predictions",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "HetGP Predictions",
+    "text": "HetGP Predictions\n\nFor a new location \\mathcal{X}, we use \\Sigma_n = \\tau^2 (C_{\\theta_Y} (X_n) + \\Lambda_n).\n\n\n\\begin{aligned}\n\\mu(\\mathcal{X}) & = \\Sigma(\\mathcal{X}, X_n) \\Sigma_n^{-1} Y_n \\\\\n\\sigma^2(\\mathcal{X}) & = \\tau^2 [1 + \\lambda(\\mathcal{X})] - \\Sigma(\\mathcal{X}, X_n) \\Sigma_n^{-1} \\Sigma(X_n, \\mathcal{X}) \\\\\n\\end{aligned}\n\n\n\nHow do we infer \\lambda(\\mathcal{X})?\n\n\n\n\nPlug in \\Sigma_n^{(\\lambda)} = \\tau_\\lambda^2 C_{\\theta_\\lambda}(X_n) and Y_n = \\bold{\\lambda}_n in the GP predictive equations. Why?\nObtain \\mu_\\lambda(\\mathcal{X}) and \\sigma^2_\\lambda(\\mathcal{X}). Use \\mu_\\lambda(\\mathcal{X}) as estimated noise level \\lambda(\\mathcal{X})."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#hetgp-toy-example-1d-example",
+    "href": "training/EFI2025/GP.html#hetgp-toy-example-1d-example",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "HetGP: Toy Example (1D Example)",
+    "text": "HetGP: Toy Example (1D Example)\n\n\n\n\nhomgp &lt;- mleHomGP(x, y)\np_hom &lt;- predict(object = homgp, x = XX)\n\nmean_gp &lt;- p_hom$mean\ns2_gp &lt;- p_hom$sd2 + p_hom$nugs"
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#hetgp-toy-example-1d-example-1",
+    "href": "training/EFI2025/GP.html#hetgp-toy-example-1d-example-1",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "HetGP: Toy Example (1D Example)",
+    "text": "HetGP: Toy Example (1D Example)\n\n\n\n\nhomgp &lt;- mleHomGP(x, y)\np_hom &lt;- predict(object = homgp, x = XX)\n\nmean_gp &lt;- p_hom$mean\ns2_gp &lt;- p_hom$sd2 + p_hom$nugs\n\n\n\n\n\n\n\n\n\n\n\n\nhetgp &lt;- mleHetGP(x, y)\np_het &lt;- predict(object = hetgp, x = XX)\n\nmean &lt;-  p_het$mean\ns2 &lt;-  p_het$sd2 + p_het$nugs"
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#hetgp-noise-levels",
+    "href": "training/EFI2025/GP.html#hetgp-noise-levels",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "HetGP: Noise Levels",
+    "text": "HetGP: Noise Levels"
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#tick-population-forecasting",
+    "href": "training/EFI2025/GP.html#tick-population-forecasting",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Tick Population Forecasting",
+    "text": "Tick Population Forecasting\n\n\nEFI-RCN held an ecological forecasting challenge NEON Forecasting Challenge (Thomas et al. 2022)\nWe focus on the Tick Populations theme which studies the abundance of the lone star tick (Amblyomma americanum)\n\n\n\n\n\n\nObjective: Forecast tick density for 4 weeks into the future.\nSites: The data is collected across 9 different NEON plots.\nData: Sparse and irregularly spaced.\nn = ~570 observations since 2014."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#predictors",
+    "href": "training/EFI2025/GP.html#predictors",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Predictors",
+    "text": "Predictors\n\n\n\nIso-week, X_1 = 1,2,... 53.\nPeriodicity, X_2 = \\text{sin}^2 \\left( \\frac{2 \\pi X_1}{106} \\right).\nSeasonality, X_3 (in practical)."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#practical",
+    "href": "training/EFI2025/GP.html#practical",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "Practical",
+    "text": "Practical\n\n\nSetup these predictors\nTransform the data to normal\nFit a GP to the Data\nMake Predictions on a testing set\nCheck how predictions perform."
+  },
+  {
+    "objectID": "training/EFI2025/GP.html#references",
+    "href": "training/EFI2025/GP.html#references",
+    "title": "Introduction to Gaussian Processes for Time Dependent Data",
+    "section": "References",
+    "text": "References\n\n\n\n\nBinois, Mickael, Robert B Gramacy, and Mike Ludkovski. 2018. “Practical Heteroscedastic Gaussian Process Modeling for Large Simulation Experiments.” Journal of Computational and Graphical Statistics 27 (4): 808–21.\n\n\nThomas, R Quinn, Carl Boettiger, Cayelan C Carey, Michael C Dietze, Leah R Johnson, Melissa A Kenney, Jason S Mclachlan, et al. 2022. “The NEON Ecological Forecasting Challenge.” Authorea Preprints."
+  },
+  {
     "objectID": "training/EFI2025.html#workshop-description",
     "href": "training/EFI2025.html#workshop-description",
     "title": "EFI 2025: Introduction to Gaussian Process Modeling of time dependent ecological data in R",
@@ -256,7 +508,7 @@
     "href": "training/EFI2025.html#training-materials",
     "title": "EFI 2025: Introduction to Gaussian Process Modeling of time dependent ecological data in R",
     "section": "Training Materials",
-    "text": "Training Materials\n\nSlides – coming soon\nPractical – coming soon"
+    "text": "Training Materials\n\nSlides\nPractical"
   },
   {
     "objectID": "paulH.html",

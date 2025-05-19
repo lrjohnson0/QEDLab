@@ -8,6 +8,8 @@ date: 2024-07-21
 date-format: long
 format:
   html:
+    page-layout: article
+    column: body
     toc: true
     toc-location: left
     html-math-method: katex
@@ -16,15 +18,13 @@ bibliography: references.bib
 link-citations: TRUE
 ---
 
-# Objectives 
+# Objectives
 
-This practical will lead you through fitting a few versions of GPs using two R packages: `laGP` [@laGP] and `hetGP` [@binois2021hetgp]. We will begin with a toy example from the lecture and then move on to a real data example to forecast tick abundances for a NEON site. 
+This practical will lead you through fitting a few versions of GPs using two R packages: `laGP` [@laGP] and `hetGP` [@binois2021hetgp]. We will begin with a toy example from the lecture and then move on to a real data example to forecast tick abundances for a NEON site.
 
 # Basics: Fitting a GP Model
 
-Here's our function from before:
-$$Y(x) = 5 \sin(x)$$
-Now, let's learn how we actually use the library `laGP` to fit a GP and make predictions at new locations. Let's begin by loading some libraries
+Here's our function from before: $$Y(x) = 5 \sin(x)$$ Now, let's learn how we actually use the library `laGP` to fit a GP and make predictions at new locations. Let's begin by loading some libraries
 
 ```{r, warning=FALSE, message=FALSE, warn.conflicts = FALSE}
 library(mvtnorm)
@@ -47,18 +47,18 @@ X <- matrix(seq(0, 2*pi, length= n), ncol=1)
 y <- 5*sin(X)
 ```
 
-First we use the `newGP` function to fit our GP. In this function, we need to pass in our inputs, outputs and any known parameters. If we do not know parameters, we can pass in some prior information we know about the parameters (which we will learn shortly) so that calculating the MLE is easier. Here, `X` indicates the input which must be a matrix, `Z` is used for response which is a vector, `d` is used for $\theta$ (length-scale), a scalar, which we assume to be known and equal to 1 and `g` is the nugget effect which is also a scalar. We pass in a very small value for numeric stability.  
+First we use the `newGP` function to fit our GP. In this function, we need to pass in our inputs, outputs and any known parameters. If we do not know parameters, we can pass in some prior information we know about the parameters (which we will learn shortly) so that calculating the MLE is easier. Here, `X` indicates the input which must be a matrix, `Z` is used for response which is a vector, `d` is used for $\theta$ (length-scale), a scalar, which we assume to be known and equal to 1 and `g` is the nugget effect which is also a scalar. We pass in a very small value for numeric stability.
 
 ```{r}
 # Fitting GP 
 gpi <- newGP(X = X, Z = y, d = 1, g = sqrt(.Machine$double.eps))
 ```
 
-Now we have fit the GP and if you print gpi it only outputs a number. This is because it assigns a number to the model as a reference but has everything stored within it. We needn't get into the details of this in this tutorial. We can assume that our model is stored in `gpi` and all we see is the reference number.  
+Now we have fit the GP and if you print gpi it only outputs a number. This is because it assigns a number to the model as a reference but has everything stored within it. We needn't get into the details of this in this tutorial. We can assume that our model is stored in `gpi` and all we see is the reference number.
 
 We will use `XX` as our predictive set i.e. we want to make predictions at those input locations. I have created this as a vector of 100 points between -0.5 and $2 \pi$ + 0.5. We are essentially using 8 data points to make predictions at 100 points. Let's see how we do. We make use of the `predGP` function.
 
-We need to pass our GP object as `gpi` = gpi (in our case) and the predictive input locations `XX` = XX for this. 
+We need to pass our GP object as `gpi` = gpi (in our case) and the predictive input locations `XX` = XX for this.
 
 ```{r}
 # Predictions
@@ -73,7 +73,7 @@ yy <- predGP(gpi = gpi, XX = XX)
 names(yy)
 ```
 
-`names(yy)` will tell us what is stored in `yy`. As we can see, we have the mean i.e. the mean predictions $\mu$ and, Sigma i.e. the covariance matrix $\Sigma$.  
+`names(yy)` will tell us what is stored in `yy`. As we can see, we have the mean i.e. the mean predictions $\mu$ and, Sigma i.e. the covariance matrix $\Sigma$.
 
 Now we can draw 100 random draws using the mean and variance matrix we obtained. We will also obtain the confidence bounds as shown below:
 
@@ -89,7 +89,7 @@ q2 <- yy$mean + qnorm(0.975, 0, sqrt(diag(yy$Sigma)))
 
 Now, we will plot the mean prediction and the bounds along with each of our 100 draws.
 
-```{r, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 7, fig.height= 5, fig.align="center", warn.conflicts = FALSE}
+```{r, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 7, fig.height= 5, fig.align='center', warn.conflicts = FALSE}
 
 # Now for the plot
 df <- data.frame(
@@ -128,13 +128,11 @@ ggplot() +
   guides(color = "none")
 ```
 
-Looks pretty cool. 
-
+Looks pretty cool.
 
 # Using GPs for data on tick abundances over time
 
 We will try all this on a simple dataset: Tick Data from [NEON Forecasting Challenge](https://projects.ecoforecast.org/neon4cast-docs/Ticks.html) We will first learn a little bit about this dataset, followed by setting up our predictors and using them in our model to predict tick density for the future season. We will also learn how to fit a separable GP and specify priors for our parameters. Finally, we will learn some basics about a HetGP (Heteroskedastic GP) and try and fit that model as well.
-
 
 ## Overview of the Data
 
@@ -145,8 +143,6 @@ We will try all this on a simple dataset: Tick Data from [NEON Forecasting Chall
 -   **Data**: Sparse and irregularly spaced. We only have \~650 observations across 10 years at 9 locations
 
 Let's start with loading all the libraries that we will need, load our data and understand what we have.
-
-
 
 ```{r setup, include = TRUE, cache=TRUE, warning=FALSE, message=FALSE }
 library(tidyverse)
@@ -162,11 +158,11 @@ head(target)
 
 ## Initial Setup
 
-- For a GP model, we assume the response ($Y$) should be normally distributed. 
+-   For a GP model, we assume the response ($Y$) should be normally distributed.
 
-- Since tick density, our response, must be greater than 0, we need to use a transform. 
+-   Since tick density, our response, must be greater than 0, we need to use a transform.
 
-- The following is the most suitable transform for our application:
+-   The following is the most suitable transform for our application:
 
 <!-- # log+1 -->
 
@@ -176,7 +172,7 @@ f(y) & = \log (y + 1) \\[2pt]
 \end{aligned}
 \end{equation}
 
-We pass in (`response` + 1) into this function to ensure we don't take a log of 0. We will adjust this in our back transform. 
+We pass in (`response` + 1) into this function to ensure we don't take a log of 0. We will adjust this in our back transform.
 
 Let's write a function for this, as well as the inverse of the transform.
 
@@ -197,7 +193,7 @@ fi <- function(y) {
 
 ## Predictors
 
-- The goal is to forecast tick populations for a season so our response (Y) here, is the tick density. However, we do not have a traditional data set with an obvious input space. What is the X? <!-- interactive -->
+-   The goal is to forecast tick populations for a season so our response (Y) here, is the tick density. However, we do not have a traditional data set with an obvious input space. What is the X? <!-- interactive -->
 
 We made a few plots earlier to help us identify what can be useful:
 
@@ -205,7 +201,7 @@ We made a few plots earlier to help us identify what can be useful:
 
 $X_1$ Iso-week: This is the iso-week number
 
-Let's convert the `iso-week` from our `target` dataset as a numeric i.e. a number. Here is a function to do the same. 
+Let's convert the `iso-week` from our `target` dataset as a numeric i.e. a number. Here is a function to do the same.
 
 ```{r, cache=TRUE}
 
@@ -242,8 +238,7 @@ fx1.gp <- function(datetime){
 }
 ```
 
-- $X_2$ Sine wave: We use this to give our model phases. We can consider this as a proxy to some other variables such as temperature which would increase from Jan to about Jun-July and then decrease. We use the following sin wave
-
+-   $X_2$ Sine wave: We use this to give our model phases. We can consider this as a proxy to some other variables such as temperature which would increase from Jan to about Jun-July and then decrease. We use the following sin wave
 
 $X_2 = \left( \text{sin} \ \left( \frac{2 \ \pi \ X_1}{106} \right) \right)^2$ where, $X_1$ is the iso-week.
 
@@ -271,12 +266,11 @@ abline(h = 0, lwd = 2)
 
 Some observations:
 
-- The sin wave (period 53) goes increases from (0, 1) and decreases all the way to -1 before coming back to 0, all within the 53 weeks in the year. But this is not what we want to achieve.
+-   The sin wave (period 53) goes increases from (0, 1) and decreases all the way to -1 before coming back to 0, all within the 53 weeks in the year. But this is not what we want to achieve.
 
-- We want the function to increase from Jan - Jun and then start decreasing till Dec. This means, we need a regular sin-wave to span 2 years so we can see this. 
+-   We want the function to increase from Jan - Jun and then start decreasing till Dec. This means, we need a regular sin-wave to span 2 years so we can see this.
 
-- We also want the next year to repeat the same pattern i.e. we want to restrict it to [0, 1] interval. Thus, we square the sin wave. 
-
+-   We also want the next year to repeat the same pattern i.e. we want to restrict it to \[0, 1\] interval. Thus, we square the sin wave.
 
 ```{r, cache=TRUE}
 fx.sin <- function(datetime, f1 = fx.iso_week){
@@ -292,13 +286,13 @@ For a GP, it's also useful to ensure that all our X's are between 0 and 1. Usual
 
 $X_i^* = \frac{X_i - \min(X)}{\max(X) - \min(X) }$ where $X = (X_1, X_2 ...X_n)$
 
-$X^* = (X_1^*, X_2^* ... X_n^*)$ will be the standarized $X$'s with all $X_i^*$ in the interval [0, 1]. 
+$X^* = (X_1^*, X_2^* ... X_n^*)$ will be the standarized $X$'s with all $X_i^*$ in the interval \[0, 1\].
 
-We can either write a function for this, or in our case, we can just divide Iso-week by 53 since that would result effectively be the same. Our Sin Predictor already lies in the interval [0, 1].
+We can either write a function for this, or in our case, we can just divide Iso-week by 53 since that would result effectively be the same. Our Sin Predictor already lies in the interval \[0, 1\].
 
 ## Model Fitting
 
-Now, let's start with modelling. We will start with one random location out of the 9 locations. 
+Now, let's start with modelling. We will start with one random location out of the 9 locations.
 
 ```{r}
 # Choose a random site number: Anything between 1-9.
@@ -319,7 +313,7 @@ We will also select only those columns that we are interested in i.e. `datetime`
 df <- df[, c("datetime", "observation")]
 ```
 
-We will use one site at first and fit a GP and make predictions. For this we first need to divide our data into a training set and a testing set. Since we have time series, we want to divide the data sequentially, i.e. we pick a date and everything before the date is our training set and after is our testing set where we check how well our model performs. We choose the date `2020-12-31`. 
+We will use one site at first and fit a GP and make predictions. For this we first need to divide our data into a training set and a testing set. Since we have time series, we want to divide the data sequentially, i.e. we pick a date and everything before the date is our training set and after is our testing set where we check how well our model performs. We choose the date `2020-12-31`.
 
 ```{r}
 # Selecting a date before which we consider everything as training data and after this is testing data.
@@ -330,7 +324,7 @@ df_test <- subset(df, df$datetime > cutoff)
 
 ## GP Model
 
-Now we will setup our X's. We already have the functions to do this and can simply pass in the datetime. We then combine $X_1$ and $X_2$ to create out input matrix $X$. Remember, everything is ordered as in our dataset. 
+Now we will setup our X's. We already have the functions to do this and can simply pass in the datetime. We then combine $X_1$ and $X_2$ to create out input matrix $X$. Remember, everything is ordered as in our dataset.
 
 ```{r}
 # Setting up iso-week and sin wave predictors by calling the functions
@@ -345,7 +339,7 @@ X <- as.matrix(cbind.data.frame(X1c, X2))
 head(X)
 ```
 
-Next step is to tranform the response to ensure it is normal. 
+Next step is to tranform the response to ensure it is normal.
 
 ```{r}
 # Extract y: observation from our training model. 
@@ -366,7 +360,7 @@ d <- darg(list(mle=TRUE, min =eps, max=5), X)
 g <- garg(list(mle=TRUE, min = eps, max = 1), y)
 ```
 
-Now, to fit the GP, we use `newGPsep`. We pass the input matrix and the response vector with some values of the parameters. Then, we use the `jmleGPsep` function to jointly estimate $\theta$ and $g$ using MLE method. `dK` allows the GP object to store derivative information which is needed for MLE calculations. `newGPsep` will fit a separable GP as opposed to `newGP` which would fit an isotropic GP. 
+Now, to fit the GP, we use `newGPsep`. We pass the input matrix and the response vector with some values of the parameters. Then, we use the `jmleGPsep` function to jointly estimate $\theta$ and $g$ using MLE method. `dK` allows the GP object to store derivative information which is needed for MLE calculations. `newGPsep` will fit a separable GP as opposed to `newGP` which would fit an isotropic GP.
 
 ```{r}
 # Fitting a GP with our data, and some starting values for theta and g
@@ -408,7 +402,7 @@ q1t <- ppt$mean + qnorm(0.025,0,sqrt(diag(ppt$Sigma))) #lower bound
 q2t <- ppt$mean + qnorm(0.975,0,sqrt(diag(ppt$Sigma))) # upper bound
 ```
 
-Now we can plot our data and predictions and see how well our model performed. We need to back transform our predictions to the original scale. 
+Now we can plot our data and predictions and see how well our model performed. We need to back transform our predictions to the original scale.
 
 ```{r, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 7, fig.height= 5, fig.align="center", warn.conflicts = FALSE}
 # Back transform our data to original
@@ -450,13 +444,11 @@ rmse <- sqrt(mean((yt_true - yt_pred)^2))
 rmse
 ```
 
-
-
 ## HetGP Model
 
-Next, we can attempt a hetGP.  We are now interested in fitting a vector of nuggets rather than a single value.  
+Next, we can attempt a hetGP. We are now interested in fitting a vector of nuggets rather than a single value.
 
-Let's use the same data we have to fit a hetGP. We already have our data `(X, y)` as well as our prediction set `XXt`. We use the `mleHetGP` command to fit a GP and pass in our data. The default covariance structure is the Squared Exponential structure. We use the `predict` function in base R and pass the hetGP object i.e. `het_gpi` to make predictions on our set `XXt`. 
+Let's use the same data we have to fit a hetGP. We already have our data `(X, y)` as well as our prediction set `XXt`. We use the `mleHetGP` command to fit a GP and pass in our data. The default covariance structure is the Squared Exponential structure. We use the `predict` function in base R and pass the hetGP object i.e. `het_gpi` to make predictions on our set `XXt`.
 
 ```{r, message = F, warning= F}
 
@@ -487,8 +479,7 @@ het_gpi <- hetGP::mleHetGP(X = X, Z = y)
 het_ppt <- predict(het_gpi, XXt)
 ```
 
-Now we obtain the mean and the confidence bounds as well as transform the data to the original scale. 
-
+Now we obtain the mean and the confidence bounds as well as transform the data to the original scale.
 
 ```{r}
 # Mean density for predictive locations and Confidence bounds
@@ -502,7 +493,7 @@ het_q1 <- fi(het_q1t)
 het_q2 <- fi(het_q2t)
 ```
 
-We can now plot the results similar to before. [Uncomment the code lines to see how a GP vs a HetGP fits the data]
+We can now plot the results similar to before. \[Uncomment the code lines to see how a GP vs a HetGP fits the data\]
 
 ```{r, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 7, fig.height= 5, fig.align="center", warn.conflicts = FALSE}
 
@@ -530,7 +521,7 @@ legend("topleft", legend = c("Train Y","Test Y", "HetGP preds"),
 
 ```
 
-The mean predictions of a GP are similar to that of a hetGP; But the confidence bounds are different. A hetGP produces sligtly tighter bounds. 
+The mean predictions of a GP are similar to that of a hetGP; But the confidence bounds are different. A hetGP produces sligtly tighter bounds.
 
 We can also compare the RMSE's using the predictions of the hetGP model.
 
@@ -544,7 +535,7 @@ rmse_het <- sqrt(mean((yt_true - het_yt_pred)^2))
 rmse_het
 ```
 
-Now that we have learnt how to fit a GP and a hetGP, it's time for a challenge. 
+Now that we have learnt how to fit a GP and a hetGP, it's time for a challenge.
 
 Try a hetGP on this example.
 
@@ -568,9 +559,9 @@ Now it's your turn to try to fit a GP on your own. Here are some options:
 
 #### Fit a GP Model for the location "SERC" i.e. `site_number = 7` and `site_number = 4`
 
-#### Fit a GP Model for all the locations 
+#### Fit a GP Model for all the locations
 
-Hint 1: Write a *function* that can fit a GP and make predictions (keep it simple. Let arguments be the inputs $X$, response $Y$ and predictive set $XX$). 
+Hint 1: Write a *function* that can fit a GP and make predictions (keep it simple. Let arguments be the inputs $X$, response $Y$ and predictive set $XX$).
 
 Hint 2: Write a *for loop* where you subset the data for each location and then call the function to fit the GP.
 
@@ -598,7 +589,7 @@ df <- target[, c("datetime", "site_id", "observation")]
 
 Hints: Follow the layout
 
-```
+```         
 # build training set for full dataset.
 x_train <- 
 y_train <- 
@@ -625,12 +616,7 @@ for(i in 1:__){
   
   #   Plot GP model preds
 }
-
 ```
-
-
-
-
 
 <!-- Change colors on plots -->
 

@@ -40,8 +40,8 @@ Workshop participants should download and install the following R packages from 
 
 ## Training Materials
 
-- [Slides -- coming soon]()
-- [Practical -- coming soon]()
+- [Slides](EFI2025/GP.qmd)
+- [Practical](EFI2025/GP_Practical.qmd)
 
 
 ```{=html}

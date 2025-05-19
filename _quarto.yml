@@ -53,5 +53,5 @@ format:
       - custom.scss
     toc: true
 
-editor: visual
+editor: source
 
