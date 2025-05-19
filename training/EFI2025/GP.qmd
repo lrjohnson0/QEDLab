@@ -1,0 +1,1178 @@
+---
+subtitle: "Virginia Tech"
+title: "Introduction to Gaussian Processes for Time Dependent Data"
+editor: source
+author: "Parul Vijay Patil, Leah R. Johnson, Robert B. Gramacy"
+title-slide-attributes:
+  data-background-size: contain
+  data-background-opacity: "0.2"
+format: revealjs
+margin: 0.03  
+width: 1920
+height: 1080
+html-math-method: katex 
+fontsize: 40pt
+bibliography: references.bib
+link-citations: TRUE
+---
+
+<!-- \boldmath{\lambda}_n -->
+
+<!-- #   math -->
+<!-- #   2D examples -->
+<!-- #   tau2 missing -->
+<!-- #   remove code junk -->
+
+## Outline
+
+We will go through the following topics:
+
+::: {.incremental}
+1.  Motivation as Ecologists
+
+2.  Introducing Gaussian Processes (GPs)
+
+3.  Hyper-Parameters in GPs
+
+4.  Fitting a GP with some code
+
+5.  Heteroskedastic GPs (HetGPs)
+
+6.  Fitting a HetGP with some code
+
+7.  Motivating Ecological Example: Hands-On Practice
+:::
+
+## Time-Depedent Data
+
+:::: {.columns}
+
+::: {.column width="50%"}
+- In ecology, we often have data with features such as:
+
+  - Sparse and irregularly sampled time series (Time-Dependent Data). 
+
+  - Varies from location to location.
+
+  - Often consists of several noisy observations due to sampling errors.
+
+:::
+
+::: {.column width="50%"}
+```{r setup, include = TRUE, echo = FALSE, warning=FALSE, message=FALSE }
+library(tidyverse)
+library(hetGP)
+library(laGP)
+library(readr)
+library(ggplot2)
+library(laGP)
+library(mvtnorm)
+library(ggrepel)
+library(viridis)
+library(gridExtra)
+```
+
+```{r, echo = FALSE, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 13, fig.height= 12, fig.align="center", warn.conflicts = FALSE}
+target <- read_csv('https://data.ecoforecast.org/neon4cast-targets/ticks/ticks-targets.csv.gz')
+
+v_color <- viridis(4, alpha = 1, begin = 0, end = 0.8, direction = 1, option = "C")
+
+format_cust <- function(.x) {
+    .x + theme(
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 20),
+      axis.text.y = element_text(size = 20),
+      axis.title.y = element_text(margin = margin(r = 25), size = 20),
+      axis.title.x = element_text(margin = margin(25), size = 20),
+      panel.grid.major = element_line(color = "lightgrey", linewidth =0.5, linetype = 2),
+      panel.background = element_rect(fill = "white", color = "black", linewidth =0.8),
+      strip.background = element_rect(fill = "gray", color = "gray"),
+      plot.title = element_text(hjust = 0.5, size = 20),
+      strip.text = element_text(color = "black"),
+      legend.position = c(0.98, 0.48),  # Adjust these values based on your preference
+      legend.justification = c(1, 1),
+      legend.key.size = unit(0.8,"cm"),
+      legend.text = element_text(size = 12),  # Adjust legend text size and font
+      legend.title = element_text(size = 12),  # Adjust legend title size and font
+      plot.margin = unit(c(0.2, 0.5, 0.2, 0.2), "cm")
+    )
+}
+
+leno <- subset(target, site_id == "LENO") #& datetime <= cutoff)
+osbs <- subset(target, site_id == "OSBS") #& datetime <= cutoff)
+konz <- subset(target, site_id == "KONZ") #& datetime <= cutoff)
+
+combined_data <- bind_rows(
+  mutate(leno, site_id = "Lenoir Landing (LENO)"),
+  mutate(osbs, site_id = "Ordway-Swisher Biological Station (OSBS)"),
+  mutate(konz, site_id = "Konza Prairie Biological Station (KONZ)")
+)
+
+combined_data$site_id <- factor(combined_data$site_id, 
+                                   levels = c("Lenoir Landing (LENO)", 
+                                              "Ordway-Swisher Biological Station (OSBS)", "Konza Prairie Biological Station (KONZ)"))
+
+f2 <- ggplot(combined_data) +
+  geom_point(aes(x = as.Date(datetime), y = observation,col= as.factor(site_id)), pch = 19, size = 4) +
+  facet_wrap(~site_id, ncol = 1) +
+  labs(y = "Density", x = "Year") +
+  scale_x_date(breaks = "years", date_labels = "%Y", date_minor_breaks = "1 year") +
+  guides(color = "none") + 
+  scale_color_viridis_d(option = "plasma", begin = 0.1, end = 0.7)
+
+format_cust(f2) + theme(axis.title.x = element_text(size = 25),
+                        axis.title.y = element_text(size = 25),
+                        strip.text.x = element_text(size = 30))
+
+```
+
+:::
+
+::::
+
+<!-- ![](fig2.png){width=80%} -->
+
+## Gaussian Process: Introduction
+
+. . .
+
+-   Gaussian Process (GP) models are non paramteric and flexible regression model.
+
+-   Excellent for uncertainty quantification (UQ).
+
+-   Suppose we have $n$ observations $Y_n$ corresponding to $X_n$ inputs, then
+
+$$Y_{n} \sim N (\mu, \Sigma_n)$$ 
+
+-   We wish to estimate the response at a new input $X_p$ i.e. $Y_p \mid Y_n, X_n$.
+
+- Note: If you set $\mu = X \beta$ and $\Sigma_n = \sigma^2 \mathbb{I}$, we have a Linear Regression (LR) Setup.
+
+<!-- -   We are essentially taking a "fancy" average of the data to make predictions -->
+## Distance
+
+-   For a GP, the covariance matrix, $\Sigma_n$ is defined by a **distance** based kernel.
+
+-   Consider,
+
+$$\Sigma_n = \tau^2 C_n \quad \text{where} \quad C_n^{ij} = \exp \left( - \vert \vert x_i - x_j \vert \vert^2 \right)$$
+
+<!-- Print a C -->
+
+-   The covariance structure now depends on how close together the inputs.
+
+-   The covariance will decay at an exponential rate as $x$ moves away from $x'$.
+
+## Visualizing a GP
+
+:::: {.columns} 
+
+::: {.column width="55%" .fragment}
+
+```{r, echo = FALSE, cache=TRUE, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 9.5, fig.height= 7.5, fig.align="center", warn.conflicts = FALSE}
+
+library(mvtnorm)
+library(laGP)
+library(ggplot2)
+library(plgp)
+
+n <- 8 
+X <- matrix(seq(0, 2*pi, length= n), ncol=1)
+rownames(X) <- c("X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8")
+y <- 5*sin(X)
+
+len <- 100
+XX <- matrix(seq(-0.5, 2*pi + 0.5, length= len), ncol=1)
+# Fitting GP 
+gpi <- newGP(X,y,d = 1,g = sqrt(.Machine$double.eps),dK = TRUE)
+yy <- predGP(gpi,XX)
+
+YY <- rmvnorm (100, yy$mean, yy$Sigma)
+q1 <- yy$mean + qnorm(0.05, 0, sqrt(diag(yy$Sigma))) 
+q2 <- yy$mean + qnorm(0.95, 0, sqrt(diag(yy$Sigma))) 
+
+df <- data.frame(
+  XX = rep(XX, each = 100),
+  YY = as.vector(YY),
+  Line = factor(rep(1:100, len))
+)
+
+inds <- c(15, 40, 88)
+XXp <- XX[inds]
+names(XXp) <- c("Xp1", "Xp2", "Xp3")
+yyp <- yy$mean[inds]
+  
+gpsin <- ggplot() +
+  geom_line(aes(x = df$XX, y = df$YY, group = df$Line), color = "darkgray", alpha = 0.5, linewidth =1) +
+  geom_line(aes(x = XX, y = yy$mean), size = 1, linewidth =2) +
+  geom_line(aes(x = XX, y = 5*sin(XX)), color = "red", linewidth =2, alpha = 0.8) +
+  geom_line(aes(x = XX, y = q1), linetype = "dashed", color = "red", size = 1,
+            alpha = 0.7,linewidth =2) +
+  geom_line(aes(x = XX, y = q2), linetype = "dashed", color = "red", size = 1,
+            alpha = 0.7,linewidth =2) +
+  geom_point(aes(x = X, y = y), shape = 20, size = 15, color = "cyan2") +
+  geom_text(aes(x = X, y = y, label = rownames(X)), size = 6.5)+
+  geom_point(aes(x = XXp, y = yyp), shape = 20, size = 10, color = "darkblue") +
+  geom_label_repel(aes(x = XXp, y = yyp, label = names(XXp)), size = 6.5)+
+  labs(title = "", x = "X", y = "Y") 
+#+legend()
+
+format_cust(gpsin) + theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 15, face = "bold"),
+    axis.text.y = element_text(size = 15, face = "bold"),
+    axis.title.y = element_text(margin = margin(r = 10), size = 20, face = "bold"),
+    axis.title.x = element_text(margin = margin(r = 10), size = 20, face = "bold"))
+```
+
+:::
+
+::: {.column width="45%" .fragment}
+
+```{r dist, echo = FALSE, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.align="center", warn.conflicts = FALSE}
+library(kableExtra)
+library(reshape2)
+library(plotly)
+
+DX <- laGP::distance(X, XXp)
+Sig <- exp(-DX)
+colnames(Sig) <- c("Xp1", "Xp2", "Xp3")#, "X4", "X5", "X6", "X7", "X8")
+rownames(Sig) <- c("X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8")
+
+# DX[lower.tri(DX)] <- NA
+Sig_melt <- melt(t(Sig))
+colnames(Sig_melt) <- c("Xi", "Xj", "Cov")
+
+hm <- ggplot(data = Sig_melt, aes(x=Xi, y=Xj, fill=Cov)) + geom_tile() + 
+    scale_fill_viridis_c(option = "F", direction = -1, begin = 0.2)
+
+hm <- format_cust(hm) + theme(axis.title.y = element_blank(),
+      axis.title.x = element_blank(),
+      plot.title = element_text(hjust = 0.5, size = 20)) + labs(title = "Sigma")
+
+ggplotly(p = hm , width = 45 * 17,  height = 40 * 17)
+```
+
+:::
+
+::::
+
+## Predictions using the Data
+
+-   We wish to find $\mathcal{Y} \vert X_n, Y_n$ and we know $Y_n \vert X_n \sim \mathcal{N}( 0, \Sigma_n)$.
+
+-   First we will "stack" the predictions and the data.
+
+```{=tex}
+\begin{equation*}
+\begin{bmatrix} 
+\mathcal{Y} \\ 
+Y_n \\ 
+\end{bmatrix}
+\ \sim \ \mathcal{N}
+\left(
+\;
+\begin{bmatrix} 
+0 \\ 
+0 \\ 
+\end{bmatrix}\; , \;
+\begin{bmatrix}
+\Sigma(\mathcal{X}, \mathcal{X}) & \Sigma(\mathcal{X}, X_n)\\
+\Sigma({X_n, \mathcal{X}}) &  \Sigma_n\\ 
+\end{bmatrix}
+\;
+\right)
+\end{equation*}
+```
+
+-   By properties of Normal distribution, $\mathcal{Y} \vert X_n, Y_n$ is also normally distributed.
+
+-   We can notate this as:
+
+```{=tex}
+\begin{equation*}
+\begin{aligned}
+\mathcal{Y} \mid Y_n, X_n \sim \mathcal{N} \left(\mu(\mathcal{X}),  \sigma^2(\mathcal{X})\right)
+\end{aligned}
+\end{equation*}
+```
+
+## Distribution of Interest!
+
+. . .
+
+-   We will apply the properties of conditional Normal distributions.
+
+```{=tex}
+\begin{equation*}
+\begin{aligned}
+\mu(\mathcal{X}) & = \Sigma(\mathcal{X}, X_n) \Sigma_n^{-1} Y_n \\[10pt]  
+\sigma^2(\mathcal{X}) & = \Sigma(\mathcal{X}, \mathcal{X}) - \Sigma(\mathcal{X}, X_n) \Sigma_n^{-1} \Sigma(X_n, \mathcal{X}) \\
+\end{aligned}
+\end{equation*}
+```
+. . .
+
+-   Everything we do, relies on these equations. 
+
+-   We need to focus on $\Sigma$ so we can tune our GP appropriately.
+
+## Sigma Matrix
+
+. . .
+
+-   $\Sigma_n = \tau^2 \left( C_{\theta}(X_n) + g \mathbb{I_n} \right)$ where $C_n$ is our kernel.
+
+. . .
+
+-   One of the most common kernels which we will focus on is the squared exponential distance kernel written as
+
+$$C_\theta(x, x') = \exp{ \left( -\frac{\vert\vert x - x' \vert \vert ^2}{\theta} \right ) }$$
+
+. . .
+
+-   What's $\tau^2$, $g$ and $\theta$ though? No more math. We will just conceptually go through these
+
+## Hyper Parameters
+
+. . .
+
+A GP is *non parameteric*, however, has some hyper-parameters. In this case,
+
+-   $\tau^2$ (Scale): This parameter can be used to adjust the amplitude of the data.
+
+-   $\theta$ (Length-scale): This parameter controls the rate of decay of correlation.
+
+-   $g$ (Nugget): This parameter controls the noise in the covariance structure (adds discontinuity)
+
+These hyper-parameters $\{ \tau^2, \theta, g \}$ are inferred using MLE/Bayesian schemes.
+
+## Scale (Amplitude)
+
+. . .
+
+-   A random draw from a multivariate normal distribution with $\tau^2$ = 1 will produce data between -2 and 2.
+
+-   Now let's visualize what happens when we increase $\tau^2$ to 25.
+
+. . .
+
+```{r, echo = FALSE, cache=TRUE, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 18, fig.height= 6.5, fig.align="center", warn.conflicts = FALSE}
+
+set.seed(24)
+n <- 100
+X <- as.matrix(seq(0, 20, length.out = n))
+Dx <- laGP::distance(X)
+
+g <- sqrt(.Machine$double.eps)
+Cn <- (exp(-Dx) + diag(g, n))
+
+Y <- rmvnorm(1, sigma = Cn)
+
+set.seed(28)
+tau2 <- 25
+Y_scaled <- rmvnorm(1, sigma = tau2 * Cn)
+
+par(mfrow = c(1, 2), mar = c(5, 5, 4, 2), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+
+# Plot 1
+matplot(X, t(Y), type = 'l', main = expression(paste(tau^2, " = 1")), 
+        ylab = "Y", xlab = "X", lwd = 2, col = "blue")
+
+# Plot 2
+matplot(X, t(Y_scaled), type = 'l', main = expression(paste(tau^2, " = 25")), 
+        ylab = "Y", xlab = "X", lwd = 2, col = "red")
+```
+
+## Length-scale (Rate of decay of correlation)
+
+. . .
+
+-   Determines how "wiggly" a function is
+
+-   Smaller $\theta$ means wigglier functions i.e. visually:
+
+. . .
+
+```{r, echo = FALSE, cache=TRUE, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 18, fig.height= 6.5, fig.align="center", warn.conflicts = FALSE}
+library(mvtnorm)
+library(laGP)
+
+set.seed(1)
+n <- 100
+X <- as.matrix(seq(0, 10, length.out = n))
+Dx <- laGP::distance(X)
+
+g <- sqrt(.Machine$double.eps)
+theta1 <- 0.5
+Cn <- (exp(-Dx/theta1) + diag(g, n))
+
+Y <- rmvnorm(1, sigma = Cn)
+
+theta2 <- 5
+Cn <- (exp(-Dx/theta2) + diag(g, n))
+
+Y2 <- rmvnorm(1, sigma = Cn)
+
+par(mfrow = c(1, 2), mar = c(5, 5, 4, 2), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+matplot(X, t(Y), type= 'l', main = expression(paste(theta, " = 0.5")),
+     ylab = "Y", ylim = c(-2.2, 2.2), lwd = 2, col = "blue")
+matplot(X, t(Y2), type= 'l',  main = expression(paste(theta, " = 5")),
+     ylab = "Y", ylim = c(-2.2, 2.2), lwd = 2, col = "red")
+
+```
+
+## Nugget (Noise)
+
+. . .
+
+-   Ensures discontinuity and prevents interpolation which in turn yields better UQ.
+
+-   We will compare a sample from g \~ 0 (\< 1e-8 for numeric stability) vs g = 0.1 to observe what actually happens.
+
+```{r, echo = FALSE, cache=TRUE, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 18, fig.height= 6.5, fig.align="center", warn.conflicts = FALSE}
+library(mvtnorm)
+library(laGP)
+
+n <- 100
+X <- as.matrix(seq(0, 10, length.out = n))
+Dx <- laGP::distance(X)
+
+g <- sqrt(.Machine$double.eps)
+Cn <- (exp(-Dx) + diag(g, n))
+Y <- rmvnorm(1, sigma = Cn)
+
+Cn <- (exp(-Dx) + diag(1e-2, n))
+
+L <- rmvnorm(1, sigma = diag(1e-2, n))
+Y2 <- Y + L
+
+par(mfrow = c(1, 2), mar = c(5, 5, 4, 2), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+plot(X, t(Y), main = expression(paste(g, " < 1e-8")),
+     ylab = "Y", xlab = "X", pch = 19, cex = 1.5, col = 1)
+lines(X, t(Y), col = "blue", lwd = 3) 
+
+plot(X, t(Y2), main = expression(paste(g, " = 0.01")),
+     ylab = "Y", xlab = "X", pch = 19, cex = 1.5, col = 1)
+lines(X, t(Y), col = "blue", lwd = 3)
+```
+
+## Toy Example (1D Example) ## {auto-animate=true}
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="60%"}
+<!-- (Code for fitting a 1D GP to show what it does exactly) - using laGP.. -->
+
+```{r, echo = T, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), warn.conflicts = FALSE}
+
+X <- matrix(seq(0, 2*pi, length = 100), ncol =1)
+n <- nrow(X) 
+true_y <- 5 * sin(X)
+obs_y <- true_y + rnorm(n, sd=1)
+
+XX <- matrix(seq(0, 2*pi, length = 200), ncol =1)
+```
+
+:::
+
+::: {.column width="40%"}
+
+```{r, echo = F, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 10, fig.height= 7.5, fig.align="top", warn.conflicts = FALSE}
+true_yy <- 5 * sin(XX)
+par(mfrow = c(1, 1), mar = c(5, 5, 0, 2), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+plot(X, obs_y, ylim = c(-10, 10), xlab = "X", ylab = "Y",
+     cex = 1.5, pch = 16)
+lines(XX, true_yy, col = 2, lwd = 3)
+
+```
+
+:::
+
+::::
+
+## Toy Example (1D Example) ## {auto-animate=true}
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="60%"}
+
+```{r, echo = T, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.align="center", warn.conflicts = FALSE}
+#| code-line-numbers: "|4-5|8-9"
+eps <- sqrt(.Machine$double.eps)
+
+# Fit GP
+gpi <- newGP(X = X, Z = obs_y, d = 0.1, 
+        g = 0.1 * var(obs_y), dK = TRUE)
+
+# Obtain MLE
+mle <- mleGP(gpi = gpi, param = c("d", "g"),
+        tmin= c(eps, eps), tmax= c(10, var(obs_y)))
+
+# Make Predictions
+p <- predGP(gpi = gpi, XX = XX)
+```
+
+:::
+
+::: {.column width="40%"}
+
+
+```{r, echo = F, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 10, fig.height= 7.5, fig.align="top", warn.conflicts = FALSE}
+
+mean_gp <- p$mean
+s2_gp <- diag(p$Sigma)
+
+par(mfrow = c(1, 1), mar = c(5, 5, 0, 2), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+plot(X, obs_y, ylim = c(-10, 10), xlab = "X", ylab = "Y",
+     cex = 1.5, pch = 16)
+lines(XX, true_yy, col = 2, lwd = 3)
+```
+:::
+
+::::
+
+## Toy Example (1D Example) ## {auto-animate=true}
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="60%"}
+
+```{r, echo = T, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), warn.conflicts = FALSE}
+#| code-line-numbers: "|12|14-15|"
+#| code-overflow: wrap
+eps <- sqrt(.Machine$double.eps)
+
+# Fit GP
+gpi <- newGP(X = X, Z = obs_y, d = 0.1, 
+        g = 0.1 * var(obs_y), dK = TRUE)
+
+# Obtain MLE
+mle <- mleGP(gpi = gpi, param = c("d", "g"),
+        tmin= c(eps, eps), tmax= c(10, var(obs_y)))
+
+# Make Predictions
+p <- predGP(gpi = gpi, XX = XX)
+
+mean_gp <- p$mean
+s2_gp <- diag(p$Sigma)
+```
+
+:::
+
+::: {.column width="40%"}
+
+
+```{r, echo = F, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 10, fig.height= 7.5, fig.align="top", warn.conflicts = FALSE}
+par(mfrow = c(1, 1), mar = c(5, 5, 0, 2), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+plot(X, obs_y, ylim = c(-10, 10), xlab = "X", ylab = "Y",
+     cex = 1.5, pch = 16)
+lines(XX, true_yy, col = 2, lwd = 3)
+  
+lines(XX, mean_gp, col = 4, lwd =3)
+lines(XX, mean_gp - 2 * sqrt(s2_gp), col = 4, lty = 2, lwd = 3)
+lines(XX, mean_gp + 2 * sqrt(s2_gp), col = 4, lty = 2, lwd = 3)
+```
+:::
+
+::::
+
+## Extentions: Anisotropic Gaussian Processes
+
+- Suppose we have a $d$ dimensional input space, $X_{n \times d}$. We can have one **length-scale** for each dimension i.e. $\mathbf{\theta} = \{ \theta_1, \dots, \theta_d \}$.
+
+- In this situation, we can rewrite the $C_n$ matrix as,
+
+$$C_\theta(x , x') = \exp{ \left( -\sum_{k=1}^{d} \frac{ (x_k - x_k')^2 }{\theta_k} \right )}$$
+
+- This is also called a Seperable GP
+
+- We will explore `newGPsep`, `mleGPsep` and `predGPsep`. 
+
+## Tick Populations: ORNL 
+
+```{r, include = F, echo = T, cache = F, warning=FALSE, message = FALSE}
+# transforms y
+f <- function(x) {
+  y <- log(x + 1)
+  return(y)
+}
+
+# This function back transforms the input argument
+fi <- function(y) {
+  x <- exp(y) - 1
+  return(x)
+}
+
+fx.iso_week <- function(datetime){
+  # Gives ISO-week in the format yyyy-w## and we extract the ##
+  x1 <- as.numeric(stringr::str_sub(ISOweek::ISOweek(datetime), 7, 8)) # find iso week #
+  return(x1)
+}
+
+fx.sin <- function(datetime, f1 = fx.iso_week){
+  # identify iso week#
+  x <- f1(datetime) 
+  # calculate sin value for that week
+  x2 <- (sin(2*pi*x/106))^2 
+  return(x2)
+}
+
+site_number <- 4
+
+# Obtaining site name
+site_names <- unique(target$site_id)
+
+# Subsetting all the data at that location
+df <- subset(target, target$site_id == site_names[site_number])
+head(df)
+
+df <- df[, c("datetime", "observation")]
+
+cutoff = as.Date('2022-12-31')
+df_train <- subset(df, df$datetime <= cutoff)
+df_test <- subset(df, df$datetime > cutoff)
+
+X1 <- fx.iso_week(df_train$datetime) # range is 1-53
+X2 <- fx.sin(df_train$datetime) # range is 0 to 1
+X1c <- X1/ 53
+X <- as.matrix(cbind.data.frame(X1c, X2))
+
+startdate <- as.Date(min(df$datetime))# identify start week
+grid_datetime <- seq.Date(startdate, Sys.Date() + 365, by = 7) # create sequence from 
+
+# Build prediction grid (From 04-2014 to 07-2025)
+XXt1 <- fx.iso_week(grid_datetime)
+XXt2 <- fx.sin(grid_datetime)
+
+# standardize and put into matrix
+XXt1c <- XXt1/53
+XXt <- as.matrix(cbind.data.frame(XXt1c, XXt2))
+
+y_obs <- df_train$observation
+y <- f(y_obs)
+
+rownames(X) <- as.character(df_train$datetime)
+colnames(X) <- c("Iso-week (c)", "Periodicity")
+```
+
+```{r, echo = F, cache = F, warning = FALSE, message = F}
+library(knitr) 
+library(kableExtra)
+snip <- head(cbind.data.frame(round(X, 2), "Transformed Density" = round(y, 2)))[1:3, ]
+knitr::kable(snip, align = "c", table.attr = "style='width:80%;'") %>%
+        kable_styling(font_size = 40, full_width = F)
+```
+
+<br>
+
+. . .
+
+:::: {.columns}
+
+::: {.column width="40%"}
+
+```{r, echo = T, cache = F, warning=F, message = FALSE}
+#| code-line-numbers: "|2-3|6|"
+# Fitting the GP
+gpi <- newGPsep(X, y, d = 0.1, 
+          g = 0.1 * var(y), dK = T)
+
+# Calculating MLEs jointly
+mle <- mleGPsep(gpi)
+
+# Predictions
+ppt <- predGPsep(gpi, XXt)
+```
+
+:::
+
+::: {.column width="60%"}
+
+```{r, echo = FALSE, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 10, fig.height= 5, fig.align="center", warn.conflicts = FALSE}
+yyt <- ppt$mean
+q1t <- ppt$mean + qnorm(0.025,0,sqrt(diag(ppt$Sigma))) #lower bound
+q2t <- ppt$mean + qnorm(0.975,0,sqrt(diag(ppt$Sigma))) # upper bound
+
+gp_yy <- fi(yyt)
+gp_q1 <- fi(q1t)
+gp_q2 <- fi(q2t)
+
+# Plot the observed points
+par(mfrow = c(1, 1), mar = c(5, 5, 0, 1),  cex.axis = 2, cex.lab = 2, font.lab = 2)
+# plot(as.Date(df$datetime), df$observation, col = "black",
+#        xlab = "Dates" , ylab = "Abundance",
+#        ylim = c(min(df_train$observation, gp_yy, gp_q1), max(df_train$observation, gp_yy, gp_q2)* 1.05), cex = 1.5)
+# 
+# # Plot the testing set data 
+# points(as.Date(df_test$datetime), df_test$observation, col ="black", pch = 19,
+#        cex = 1.5)
+# 
+# # Line to indicate seperation between train and test data
+# abline(v = as.Date(cutoff), lwd = 2)
+# 
+# # Add the predicted response and the quantiles
+# lines(grid_datetime, gp_yy, col = 4, lwd = 3.5)
+# lines(grid_datetime, gp_q1, col = 4, lwd = 3, lty = 2)
+# lines(grid_datetime, gp_q2, col = 4, lwd = 3, lty =2)
+```
+
+:::
+
+::::
+
+
+## Tick Populations: ORNL
+
+```{r, echo = F, cache = F, warning = FALSE, message = F}
+library(knitr) 
+library(kableExtra)
+snip <- head(cbind.data.frame(round(X, 2), "Transformed Density" = round(y, 2)))[1:3, ]
+knitr::kable(snip, align = "c", table.attr = "style='width:80%;'") %>%
+        kable_styling(font_size = 40, full_width = F)
+```
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="40%"}
+
+```{r, echo = T, cache = F, warning=F, message = FALSE}
+# Fitting the GP
+#| code-line-numbers: "|9|"
+gpi <- newGPsep(X, y, d = 0.1, 
+          g = 0.1 * var(y), dK = T)
+
+# Calculating MLEs jointly
+mle <- mleGPsep(gpi)
+
+# Predictions
+ppt <- predGPsep(gpi, XXt)
+```
+
+:::
+
+::: {.column width="60%"}
+
+```{r, echo = FALSE, cache=T, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 10, fig.height= 5, fig.align="center", warn.conflicts = FALSE}
+yyt <- ppt$mean
+q1t <- ppt$mean + qnorm(0.025,0,sqrt(diag(ppt$Sigma))) #lower bound
+q2t <- ppt$mean + qnorm(0.975,0,sqrt(diag(ppt$Sigma))) # upper bound
+
+gp_yy <- fi(yyt)
+gp_q1 <- fi(q1t)
+gp_q2 <- fi(q2t)
+
+# Plot the observed points
+par(mfrow = c(1, 1), mar = c(5, 5, 0, 1),  cex.axis = 2, cex.lab = 2, font.lab = 2)
+plot(as.Date(df$datetime), df$observation, col = "black",
+       xlab = "Dates" , ylab = "Abundance",
+       ylim = c(min(df_train$observation, gp_yy, gp_q1), max(df_train$observation, gp_yy, gp_q2)* 1.05), cex = 1.5)
+
+# Plot the testing set data 
+points(as.Date(df_test$datetime), df_test$observation, col ="black", pch = 19,
+       cex = 1.5)
+
+# Line to indicate seperation between train and test data
+abline(v = as.Date(cutoff), lwd = 2)
+
+# Add the predicted response and the quantiles
+lines(grid_datetime, gp_yy, col = 4, lwd = 3.5)
+lines(grid_datetime, gp_q1, col = 4, lwd = 3, lty = 2)
+lines(grid_datetime, gp_q2, col = 4, lwd = 3, lty =2)
+```
+
+:::
+
+::::
+
+## Extension: Heteroskedastic GPs (HetGP)
+
+-   Suppose we have noise is input dependent [@binois2018practical].
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+```{r hetviz, echo = FALSE, cache=T, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 8.5, fig.height= 6, fig.align="center", warn.conflicts = FALSE}
+
+set.seed(5)
+fx <- function(x){
+  result <- (6 * x - 2)^2* sin(12 * x - 4)
+}
+
+rx <- function(x){
+  result <- (1.1 + sin(2 * pi * x))^2
+  return(result)
+}
+
+x <- xn <- sort(runif(200))
+
+XX <- sort(runif(300))
+yy <- fx(XX)
+
+rn <- drop(rx(xn))
+noise <- as.numeric(t(rmvnorm(1, sigma = diag(rn, length(xn)))))
+
+f <- fx(x)
+y <- f + noise
+
+# f <- (f - mean(f))/sd(f)
+# y <- (y - mean(y))/sd(y)
+reps <- find_reps(x, y)
+
+par(mfrow = c(1, 1), mar = c(4, 4.5, 0, 1), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+plot(x, y, pch = 19, cex = 1.2)
+lines(x, f, col = "red", lwd = 3)
+abline(v = 0.6, col = "#646464", lwd = 3)
+```
+
+
+:::
+
+::: {.column width="50%"}
+
+
+```{r, include = F, echo = FALSE, cache=T, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 8.5, fig.height= 6, fig.align="center", warn.conflicts = FALSE}
+
+par(mfrow = c(1, 1), mar = c(4, 4.5, 0, 1), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+plot(x, rn, pch = 19, type = 'l', lwd = 3, col = "red", xlab = "x", ylab = "noise")
+abline(v = 0.6, col = "#646464", lwd = 3)
+```
+
+:::
+
+::::
+
+## Extension: Heteroskedastic GPs (HetGP)
+
+-   Suppose we have noise is input dependent [@binois2018practical].
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+```{r hetviz2, echo = FALSE, cache=T, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 8.5, fig.height= 6, fig.align="center", warn.conflicts = FALSE}
+par(mfrow = c(1, 1), mar = c(4, 4.5, 0, 1), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+plot(x, y, pch = 19, cex = 1.2)
+lines(x, f, col = "red", lwd = 3)
+abline(v = 0.6, col = "#646464", lwd = 3)
+```
+
+
+:::
+
+::: {.column width="50%"}
+
+
+```{r, include = T, echo = FALSE, cache=T, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 8.5, fig.height= 6, fig.align="center", warn.conflicts = FALSE}
+
+par(mfrow = c(1, 1), mar = c(4, 4.5, 0, 1), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+
+plot(x, rn, pch = 19, type = 'l', lwd = 3, col = "red", xlab = "x", ylab = "noise")
+abline(v = 0.6, col = "#646464", lwd = 3)
+```
+
+:::
+
+::::
+. . . 
+
+-   We can use a different **nugget** for each unique input rather than a scalar $g$.
+
+## HetGP Setup
+
+-   Let $X_n, Y_n$ be the data and $\mathbf{\lambda_n}$ be the noise level at input $X_n$.
+
+-   In case of a hetGP, we have:
+
+$$
+\begin{align*} 
+Y_n & \sim GP \left( 0, \tau^2 \left( C_{\theta_Y}(X_n)  + \Lambda_n \right)  \right) \quad \text{where,} \quad \Lambda_n = \text{Diag}(\bold{\lambda}_n);\\
+\log \bold{\lambda}_n & \sim GP \left( 0, \tau_\lambda^2 C_{\theta_\lambda}(X_n)  \right)\\
+\end{align*}
+$$
+
+-   Note that in a regular GP: $\Lambda_n = g \mathbb{I}_n$. We average over the noise across the input space. 
+
+-   We must infer $\{ \bold{\lambda}_n, \theta_Y, \theta_\lambda, \tau^2, \tau^2_\lambda \}$ using MLE/Bayesian schemes.
+
+## HetGP Predictions
+
+-   For a new location $\mathcal{X}$, we use $\Sigma_n = \tau^2 (C_{\theta_Y} (X_n) + \Lambda_n)$.
+
+$$
+\begin{aligned}
+\mu(\mathcal{X}) & = \Sigma(\mathcal{X}, X_n) \Sigma_n^{-1} Y_n \\
+\sigma^2(\mathcal{X}) & = \tau^2 [1 + \lambda(\mathcal{X})] - \Sigma(\mathcal{X}, X_n) \Sigma_n^{-1} \Sigma(X_n, \mathcal{X}) \\
+\end{aligned}
+$$
+
+. . .
+
+-   How do we infer $\lambda(\mathcal{X})$?
+
+. . .
+
+-   Plug in $\Sigma_n^{(\lambda)} = \tau_\lambda^2 C_{\theta_\lambda}(X_n)$ and $Y_n = \bold{\lambda}_n$ in the GP predictive equations. Why?
+
+- Obtain $\mu_\lambda(\mathcal{X})$ and $\sigma^2_\lambda(\mathcal{X})$. Use $\mu_\lambda(\mathcal{X})$ as estimated noise level $\lambda(\mathcal{X})$.
+
+## HetGP: Toy Example (1D Example)
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+```{r fit, include = TRUE, echo = FALSE, cache=F, warning=FALSE, message=FALSE}
+library(mvtnorm)
+library(laGP)
+library(hetGP)
+XX <- as.matrix(XX)
+```
+
+```{r, include = TRUE, echo = T, cache=T, warning=FALSE, message=FALSE}
+#| code-line-numbers: "|1|2|4-5|"
+homgp <- mleHomGP(x, y)
+p_hom <- predict(object = homgp, x = XX)
+
+mean_gp <- p_hom$mean
+s2_gp <- p_hom$sd2 + p_hom$nugs
+```
+
+```{r data,  include = TRUE, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width=10, fig.height=7.5, fig.align="center", warn.conflicts = FALSE}
+par(mfrow = c(1, 1), mar = c(5, 5, 4, 2), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+plot(x, y, ylim = c(-8, 17), main = "GP fit", xlab = "X", ylab = "Y",
+     cex = 1.5, pch = 16)
+lines(x, f, col = "red", lwd = 3)
+lines(XX, mean_gp, col = "blue", lwd =3)
+lines(XX, mean_gp - 2 * sqrt(s2_gp), col = "blue", lty = 2, lwd = 3)
+lines(XX, mean_gp + 2 * sqrt(s2_gp), col = "blue", lty = 2, lwd = 3)
+legend("topleft", legend = c("fit", "truth"), col = c("blue", "red"), lty = c(1 , 1),  cex = 2, bty = "n", lwd = c(2, 2))
+```
+
+:::
+
+::: {.column width="50%"}
+
+:::
+
+::::
+
+## HetGP: Toy Example (1D Example)
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+```{r, include = TRUE, echo = FALSE, cache=F, warning=FALSE, message=FALSE}
+library(mvtnorm)
+library(laGP)
+library(hetGP)
+XX <- as.matrix(XX)
+```
+
+```{r, include = TRUE, echo = T, cache=F, warning=FALSE, message=FALSE}
+homgp <- mleHomGP(x, y)
+p_hom <- predict(object = homgp, x = XX)
+
+mean_gp <- p_hom$mean
+s2_gp <- p_hom$sd2 + p_hom$nugs
+```
+
+```{r,  include = TRUE, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width=10, fig.height=7.5, fig.align="center", warn.conflicts = FALSE}
+par(mfrow = c(1, 1), mar = c(5, 5, 4, 2), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+plot(x, y, ylim = c(-8, 17), main = "GP fit", xlab = "X", ylab = "Y",
+     cex = 1.5, pch = 16)
+lines(x, f, col = "red", lwd = 3)
+lines(XX, mean_gp, col = "blue", lwd =3)
+lines(XX, mean_gp - 2 * sqrt(s2_gp), col = "blue", lty = 2, lwd = 3)
+lines(XX, mean_gp + 2 * sqrt(s2_gp), col = "blue", lty = 2, lwd = 3)
+legend("topleft", legend = c("fit", "truth"), col = c("blue", "red"), lty = c(1 , 1),  cex = 2, bty = "n", lwd = c(2, 2))
+```
+
+:::
+
+::: {.column width="50%"}
+
+```{r, include = TRUE, echo = T, cache=F, warning=FALSE, message=FALSE}
+#| code-line-numbers: "|1|2|4-5|"
+hetgp <- mleHetGP(x, y)
+p_het <- predict(object = hetgp, x = XX)
+
+mean <-  p_het$mean
+s2 <-  p_het$sd2 + p_het$nugs
+```
+
+```{r,  include = TRUE, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width=10, fig.height=7.5, fig.align="center", warn.conflicts = FALSE}
+par(mfrow = c(1, 1), mar = c(5, 5, 4, 2), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+plot(x, y, ylim = c(-8, 17), main = "HetGP fit",  xlab = "X", ylab = "Y",
+     cex = 1.5, pch = 16)
+lines(x, f, col = "red", lwd = 3)
+lines(XX, mean, col = "blue", lwd = 3)
+lines(XX, mean - 2 * sqrt(s2), col = "blue", lty = 2, lwd = 3)
+lines(XX, mean + 2 * sqrt(s2), col = "blue", lty = 2, lwd = 3)
+legend("topleft", legend = c("fit", "truth"), col = c("blue", "red"), lty = c(1 , 1),  cex = 2, bty = "n", lwd = c(2, 2))
+```
+
+:::
+
+::::
+
+## HetGP: Noise Levels
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+
+```{r,  include = TRUE, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width=10, fig.height=7.5, fig.align="center", warn.conflicts = FALSE}
+par(mfrow = c(1, 1), mar = c(5, 5, 4, 2), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+
+plot(XX, p_hom$nugs, col = "blue", type  = 'l', lwd = 2, ylim = c(0, 5),
+     cex = 1.5, pch = 16, main = "GP Noise", xlab = "x", ylab = "Noise level")
+lines(XX, rx(XX), col = "red", type  = 'l', lwd = 2)   
+legend("topright", legend = c("nugget", "truth"), col = c("blue", "red"), lty = c(1 , 1),  cex = 2, bty = "n", lwd = c(2, 2))
+```
+
+:::
+
+::: {.column width="50%"}
+
+
+```{r,  include = TRUE, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width=10, fig.height=7.5, fig.align="center", warn.conflicts = FALSE}
+par(mfrow = c(1, 1), mar = c(5, 5, 4, 2), cex.axis = 2, cex.lab = 2, cex.main = 3, font.lab = 2)
+plot(XX, p_het$nugs, col = "blue", type  = 'l', lwd = 2, ylim = c(0, 5), 
+     main = "HetGP noise", xlab = "x", ylab = "Noise level")
+lines(XX, rx(XX), col = "red", type  = 'l', lwd = 2)
+legend("topright", legend = c("nugget", "truth"), col = c("blue", "red"), lty = c(1 , 1), bty = "n", cex = 2, lwd = c(2, 2))
+```
+
+:::
+
+::::
+
+## Tick Population Forecasting
+
+. . .
+
+-   EFI-RCN held an ecological forecasting challenge [NEON Forecasting Challenge](https://projects.ecoforecast.org/neon4cast-docs/Ticks.html) [@thomas2022neon]
+
+-   We focus on the **Tick Populations** theme which studies the abundance of the lone star tick (*Amblyomma americanum*)
+
+. . .
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+-   **Objective**: Forecast tick density for 4 weeks into the future.
+
+-   **Sites**: The data is collected across 9 different NEON plots.
+
+-   **Data**: Sparse and irregularly spaced. 
+
+-   n = \~570 observations since 2014.
+
+:::
+
+::: {.column width="50%"}
+
+```{r, include = TRUE, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width=10, fig.height=6.8, fig.align="center", warn.conflicts = FALSE}
+target <- readr::read_csv("https://data.ecoforecast.org/neon4cast-targets/ticks/ticks-targets.csv.gz", guess_max = 1e6)
+target <- target[, c(1, 2, 4)]
+colnames(target) <- c("datetime", "site_id", "observation")
+
+site_data <- readr::read_csv("https://raw.githubusercontent.com/eco4cast/neon4cast-targets/main/NEON_Field_Site_Metadata_20220412.csv") |> 
+  dplyr::filter(ticks == 1)
+site.info <- site_data[,c("field_site_id", "field_site_state",
+                          "field_latitude", "field_longitude", "field_mean_elevation_m")]
+colnames(site.info) <- c("site_id", "state", "lat", "long", "alt")
+
+site.sum <- target |> group_by(site_id) |> summarize(max.var = max(observation), mean.var = mean(observation))
+sites <- site.info |> left_join(site.sum)
+
+us_map <- map_data("state")
+southern_eastern_states <- c("Kansas", "Texas", "Oklahoma", "Arkansas", "Louisiana", "Mississippi", "Alabama", "Georgia", "Florida", "South Carolina", "North Carolina", "Tennessee", "Kentucky", "Virginia", "Missouri", "Illinois", "Indiana", "Ohio", "Maryland", "Delaware", "West Virginia","New York", "Connecticut", "Pennsylvania","New Jersey")
+
+filtered_map <- subset(us_map,region %in% tolower(southern_eastern_states))
+ 
+f1 <- ggplot() +
+  geom_polygon(data = us_map, aes(x = long, y = lat, group = group), fill = "white", 
+               color = "darkgray", linewidth = 1) +
+  geom_polygon(data = filtered_map, aes(x = long, y = lat, group = group), fill = "lightgrey", 
+               color = "darkgray", linewidth = 1) +
+  geom_point(data = sites, aes(x = long, y = lat, fill = mean.var), shape = 21, size =4) +
+  geom_text_repel(data = sites, aes(x = long, y = lat, label = site_id), 
+                  box.padding = 0.5, point.padding = 0.5, force = 3,
+                  size = 7, color = "black", fontface = "bold") +
+  scale_size_continuous(range = c(1, 5), name = "Max Density") +
+  scale_fill_viridis_c(option = "F", direction = -1, name = "Mean Density") # Adjust colors as needed
+
+format_cust(f1) + 
+  theme(axis.title.y = element_blank(), axis.title.x = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 20),
+        axis.text.y = element_text(size = 20))
+```
+
+:::
+
+::::
+
+## Predictors
+
+:::: {.columns}
+
+::: {.column width="40%"}
+
+-   Iso-week, $X_1$ = $1,2,... 53$.
+
+-   Periodicity, $X_2$ = $\text{sin}^2 \left( \frac{2 \pi X_1}{106} \right)$.
+
+-  Seasonality, $X_3$ (in practical).
+
+:::
+
+::: {.column width="60%"}
+
+```{r, include = TRUE, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width=13, fig.height=11, fig.align="center", warn.conflicts = FALSE}
+f2 <- ggplot(combined_data) +
+  geom_point(aes(x = as.Date(datetime), y = observation,col= as.factor(site_id)), pch = 19, size = 4) +
+  facet_wrap(~site_id, ncol = 1) +
+  labs(y = "Density", x = "Year") +
+  scale_x_date(breaks = "years", date_labels = "%Y", date_minor_breaks = "1 year") +
+  guides(color = "none") + 
+  scale_color_viridis_d(option = "plasma", begin = 0.1, end = 0.7)
+
+format_cust(f2) + theme(axis.title.x = element_text(size = 25),
+                        axis.title.y = element_text(size = 25),
+                        strip.text.x = element_text(size = 30))
+```
+
+:::
+
+::::
+
+## Practical
+
+. . .
+
+-   Setup these predictors
+-   Transform the data to normal
+-   Fit a GP to the Data
+-   Make Predictions on a testing set
+-   Check how predictions perform.
+
+## References
