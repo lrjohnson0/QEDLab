@@ -1,10 +1,14 @@
 ---
 title: "Introduction to Gaussian Processes for Time Dependent Data (Practical)"
 author:
-  - name: Parul Vijay Patil, Leah R. Johnson, Robert B. Gramacy
+  - name: Parul Vijay Patil 
+    affiliation: Virginia Tech
+  - name: Leah R. Johnson
+    affiliation: Virginia Tech
+  - name: Robert B. Gramacy
     affiliation: Virginia Tech
 citation: true
-date: 2024-07-21
+date: 2025-05-19
 date-format: long
 format:
   html:
