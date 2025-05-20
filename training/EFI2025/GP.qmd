@@ -70,7 +70,6 @@ library(mvtnorm)
 library(ggrepel)
 library(viridis)
 library(gridExtra)
-library(maps)
 ```
 
 ```{r, echo = FALSE, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 13, fig.height= 12, fig.align="center", warn.conflicts = FALSE}
@@ -313,7 +312,7 @@ Y_n \\
 ```
 . . .
 
--   Everything we do, relies on these equations. 
+-   To make predictions at a single new location $x$, $\Sigma(x, x) = 1 + g$.
 
 -   We need to focus on $\Sigma$ so we can tune our GP appropriately.
 
@@ -1142,7 +1141,7 @@ format_cust(f1) +
 
 -   Periodicity, $X_2$ = $\text{sin}^2 \left( \frac{2 \pi X_1}{106} \right)$.
 
--  Seasonality, $X_3$ (in practical).
+-   Mean Elevation, $X_3$.
 
 :::
 
