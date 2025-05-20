@@ -326,7 +326,7 @@
     "href": "training/EFI2025/GP.html#distribution-of-interest",
     "title": "Introduction to Gaussian Processes for Time Dependent Data",
     "section": "Distribution of Interest!",
-    "text": "Distribution of Interest!\n\n\nWe will apply the properties of conditional Normal distributions.\n\n\\begin{equation*}\n\\begin{aligned}\n\\mu(\\mathcal{X}) & = \\Sigma(\\mathcal{X}, X_n) \\Sigma_n^{-1} Y_n \\\\[10pt]  \n\\sigma^2(\\mathcal{X}) & = \\Sigma(\\mathcal{X}, \\mathcal{X}) - \\Sigma(\\mathcal{X}, X_n) \\Sigma_n^{-1} \\Sigma(X_n, \\mathcal{X}) \\\\\n\\end{aligned}\n\\end{equation*}\n\n\n\nEverything we do, relies on these equations.\nWe need to focus on \\Sigma so we can tune our GP appropriately."
+    "text": "Distribution of Interest!\n\n\nWe will apply the properties of conditional Normal distributions.\n\n\\begin{equation*}\n\\begin{aligned}\n\\mu(\\mathcal{X}) & = \\Sigma(\\mathcal{X}, X_n) \\Sigma_n^{-1} Y_n \\\\[10pt]  \n\\sigma^2(\\mathcal{X}) & = \\Sigma(\\mathcal{X}, \\mathcal{X}) - \\Sigma(\\mathcal{X}, X_n) \\Sigma_n^{-1} \\Sigma(X_n, \\mathcal{X}) \\\\\n\\end{aligned}\n\\end{equation*}\n\n\n\nTo make predictions at a single new location x, \\Sigma(x, x) = 1 + g.\nWe need to focus on \\Sigma so we can tune our GP appropriately."
   },
   {
     "objectID": "training/EFI2025/GP.html#sigma-matrix",
@@ -466,7 +466,7 @@
     "href": "training/EFI2025/GP.html#predictors",
     "title": "Introduction to Gaussian Processes for Time Dependent Data",
     "section": "Predictors",
-    "text": "Predictors\n\n\n\nIso-week, X_1 = 1,2,... 53.\nPeriodicity, X_2 = \\text{sin}^2 \\left( \\frac{2 \\pi X_1}{106} \\right).\nSeasonality, X_3 (in practical)."
+    "text": "Predictors\n\n\n\nIso-week, X_1 = 1,2,... 53.\nPeriodicity, X_2 = \\text{sin}^2 \\left( \\frac{2 \\pi X_1}{106} \\right).\nMean Elevation, X_3."
   },
   {
     "objectID": "training/EFI2025/GP.html#practical",
