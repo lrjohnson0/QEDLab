@@ -4,7 +4,7 @@ format:
   html:
     toc: false
 about:
-  template: trestles
+  template: jolla
   image: images/leah.jpg
   links:
     - icon: google
@@ -13,9 +13,6 @@ about:
     - icon: card-text
       text: CV
       url: https://lrjohnson0.github.io/QEDLab/lrjohnsonCV.pdf
-    - icon: twitter
-      text: Twitter
-      url: https://twitter.com/Lrjohnson0
     - icon: email
       text: Email
       url: mailto:lrjohn@vt.edu

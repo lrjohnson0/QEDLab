@@ -12,8 +12,6 @@ website:
   navbar:
     background: dark
     left:
-      - text: "Home"
-        href: index.qmd
       - text: "People"
         menu:
           - text: "PI: Dr. LR Johnson"
@@ -39,8 +37,6 @@ website:
     right:
       - icon: github
         href: https://github.com/lrjohnson0/QEDLab
-      - icon: twitter
-        href: https://twitter.com/QEDlab
     search: true
 
 

@@ -4,7 +4,7 @@ format:
   html:
     toc: false
 about:
-  template: trestles
+  template: jolla
   image: images/sean_headshot.jpg
   image-width: 10em
   links:
@@ -19,9 +19,9 @@ document-css: true
 
 ## Bio
 
-Sean is a senior in Statistics and Mathematics at Virginia Tech. He plans to attend Columbia University this fall for a M.S in Biostatistics. His research interest is in disease forecasting using Bayesian methods.
+Sean an MS student in Biostatistics at Columbia University. He previously studied Statistics and Mathematics at Virginia Tech. His research interest is in disease forecasting using Bayesian methods.
 
-In the lab, Sean is actively developing bayesTPC, an interface to easily fit Bayesian thermal performance curves in R. Outside of school, he enjoys rock climbing, listening to and making music, and playing chess.
+Sean is actively developing and maintaining [`bayesTPC`](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.70004), an interface to easily fit Bayesian thermal performance curves in R. Outside of school, he enjoys rock climbing, listening to and making music, and playing chess.
 
 ## Education
 
