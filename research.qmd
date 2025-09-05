@@ -21,11 +21,15 @@ key: \* - postdoctoral advisee; $\dagger$ - graduate student advisee (including 
 
 ### Current Grants
 
--   *Collaborative Research: MRA: Using NEON data to elucidate the ecological effects of global environmental change on phenology across time and space*. NSF DEB #2017463.
-
 -   *Collaborative Research: CIBR: VectorByte: A Global Informatics Platform for studying the Ecology of Vector-Borne Diseases*. NSF DBI #2016264.
 
--   *CAREER: Quantifying heterogeneity and uncertainty in the transmission of vector borne dis- eases with a Bayesian trait-based framework*. NSF DMS/DEB #1750113
+
+### Recent Grants
+
+-   *CAREER: Quantifying heterogeneity and uncertainty in the transmission of vector borne diseases with a Bayesian trait-based framework*. NSF DMS/DEB #1750113
+
+-   *Collaborative Research: MRA: Using NEON data to elucidate the ecological effects of global environmental change on phenology across time and space*. NSF DEB #2017463.
+
 
 ## Bayesian inference for ecological models
 
@@ -42,11 +46,19 @@ Ecological models come in many flavors from relatively simple response functions
 
 -   *CAREER: Quantifying heterogeneity and uncertainty in the transmission of vector borne dis- eases with a Bayesian trait-based framework*. NSF DMS/DEB #1750113
 
-## Packages
+## Software Packages
 
-### Bayesian Inference for Differential Equations
+### `bayesTPC`
 
-Differential equations (DEs) are commonly used to model the temporal evolution of biological systems, but statistical methods for comparing DE models to data and for parameter inference are relatively poorly developed. This is especially problematic in the context of biological systems where observations are often noisy and only a small number of time points may be available. We have developed deBInfer, an R package implementing a Bayesian framework for parameter inference in DEs. This approach offers a rigorous methodology for parameter inference as well as modeling the link between unobservable model states and parameters, and observable quantities.
+The [bayesTPC](https://github.com/johnwilliamsmithjr/bayesTPC) *R* package is for Bayesian fitting of Thermal Performance Curves (TPCs) to trait responses. The package is built using the [nimble](https://r-nimble.org/) language and machinery as the underlying engine for Markov Chain Monte Carlo (MCMC). Our main aims in releasing bayesTPC were to support the adoption of Bayesian approaches in thermal physiology, and to promote TPC fitting that adequately quantifies uncertainty. For a bit more information, take a look at the [blog post about the paper](https://www.vectorbyte.org/blog/paper-introducing-bayestpc-is-out-in-methods-in-ecology-and-evolution) over at the [VectorByte Initiative](https://www.vectorbyte.org).
 
--   [Boersch‐Supan, P.H., Ryan, S.J. and Johnson, L.R., 2017. "deBInfer: Bayesian inference for dynamical models of biological systems in R". *Methods in Ecology and Evolution*, 8(4), pp.511-518.](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12679){.external target="_blank"}
--   [**deBInfer** package on CRAN](https://cran.r-project.org/web/packages/deBInfer/index.html){.external target="_blank"}
+- Paper: [Sorek, S., Smith, J. W. Jr., Huxley, P. J., & Johnson, L. R. (2025). `bayesTPC`: Bayesian inference for thermal performance curves in *R*. Methods in Ecology and Evolution, 16, 687–697.](https://doi.org/10.1111/2041-210X.70004){.external target="_blank"}
+- [**bayesTPC** git repository](https://github.com/johnwilliamsmithjr/bayesTPC){.external target="_blank"}
+
+### `deBInfer`
+
+Differential equations (DEs) are commonly used to model the temporal evolution of biological systems, but statistical methods for comparing DE models to data and for parameter inference are relatively poorly developed. This is especially problematic in the context of biological systems where observations are often noisy and only a small number of time points may be available. We have developed `deBInfer`, an *R* package implementing a Bayesian framework for parameter inference in DEs. This approach offers a rigorous methodology for parameter inference as well as modeling the link between unobservable model states and parameters, and observable quantities.
+
+-   Paper: [Boersch‐Supan, P.H., Ryan, S.J. and Johnson, L.R., 2017. "deBInfer: Bayesian inference for dynamical models of biological systems in R". *Methods in Ecology and Evolution*, 8(4), pp.511-518.](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12679){.external target="_blank"}
+-   Package: [**deBInfer** package on CRAN](https://cran.r-project.org/web/packages/deBInfer/index.html){.external target="_blank"}
+

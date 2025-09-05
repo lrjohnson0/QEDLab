@@ -195,15 +195,17 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#recent-papers" id="toc-recent-papers" class="nav-link" data-scroll-target="#recent-papers">Recent Papers</a></li>
   <li><a href="#current-grants" id="toc-current-grants" class="nav-link" data-scroll-target="#current-grants">Current Grants</a></li>
+  <li><a href="#recent-grants" id="toc-recent-grants" class="nav-link" data-scroll-target="#recent-grants">Recent Grants</a></li>
   </ul></li>
   <li><a href="#bayesian-inference-for-ecological-models" id="toc-bayesian-inference-for-ecological-models" class="nav-link" data-scroll-target="#bayesian-inference-for-ecological-models">Bayesian inference for ecological models</a>
   <ul class="collapse">
   <li><a href="#recent-papers-1" id="toc-recent-papers-1" class="nav-link" data-scroll-target="#recent-papers-1">Recent Papers</a></li>
   <li><a href="#current-grants-1" id="toc-current-grants-1" class="nav-link" data-scroll-target="#current-grants-1">Current Grants</a></li>
   </ul></li>
-  <li><a href="#packages" id="toc-packages" class="nav-link" data-scroll-target="#packages">Packages</a>
+  <li><a href="#software-packages" id="toc-software-packages" class="nav-link" data-scroll-target="#software-packages">Software Packages</a>
   <ul class="collapse">
-  <li><a href="#bayesian-inference-for-differential-equations" id="toc-bayesian-inference-for-differential-equations" class="nav-link" data-scroll-target="#bayesian-inference-for-differential-equations">Bayesian Inference for Differential Equations</a></li>
+  <li><a href="#bayestpc" id="toc-bayestpc" class="nav-link" data-scroll-target="#bayestpc"><code>bayesTPC</code></a></li>
+  <li><a href="#debinfer" id="toc-debinfer" class="nav-link" data-scroll-target="#debinfer"><code>deBInfer</code></a></li>
   </ul></li>
   </ul>
 </nav>
@@ -250,9 +252,14 @@ window.Quarto = {
 <section id="current-grants" class="level3">
 <h3 class="anchored" data-anchor-id="current-grants">Current Grants</h3>
 <ul>
+<li><em>Collaborative Research: CIBR: VectorByte: A Global Informatics Platform for studying the Ecology of Vector-Borne Diseases</em>. NSF DBI #2016264.</li>
+</ul>
+</section>
+<section id="recent-grants" class="level3">
+<h3 class="anchored" data-anchor-id="recent-grants">Recent Grants</h3>
+<ul>
+<li><p><em>CAREER: Quantifying heterogeneity and uncertainty in the transmission of vector borne diseases with a Bayesian trait-based framework</em>. NSF DMS/DEB #1750113</p></li>
 <li><p><em>Collaborative Research: MRA: Using NEON data to elucidate the ecological effects of global environmental change on phenology across time and space</em>. NSF DEB #2017463.</p></li>
-<li><p><em>Collaborative Research: CIBR: VectorByte: A Global Informatics Platform for studying the Ecology of Vector-Borne Diseases</em>. NSF DBI #2016264.</p></li>
-<li><p><em>CAREER: Quantifying heterogeneity and uncertainty in the transmission of vector borne dis- eases with a Bayesian trait-based framework</em>. NSF DMS/DEB #1750113</p></li>
 </ul>
 </section>
 </section>
@@ -275,14 +282,22 @@ window.Quarto = {
 </ul>
 </section>
 </section>
-<section id="packages" class="level2">
-<h2 class="anchored" data-anchor-id="packages">Packages</h2>
-<section id="bayesian-inference-for-differential-equations" class="level3">
-<h3 class="anchored" data-anchor-id="bayesian-inference-for-differential-equations">Bayesian Inference for Differential Equations</h3>
-<p>Differential equations (DEs) are commonly used to model the temporal evolution of biological systems, but statistical methods for comparing DE models to data and for parameter inference are relatively poorly developed. This is especially problematic in the context of biological systems where observations are often noisy and only a small number of time points may be available. We have developed deBInfer, an R package implementing a Bayesian framework for parameter inference in DEs. This approach offers a rigorous methodology for parameter inference as well as modeling the link between unobservable model states and parameters, and observable quantities.</p>
+<section id="software-packages" class="level2">
+<h2 class="anchored" data-anchor-id="software-packages">Software Packages</h2>
+<section id="bayestpc" class="level3">
+<h3 class="anchored" data-anchor-id="bayestpc"><code>bayesTPC</code></h3>
+<p>The <a href="https://github.com/johnwilliamsmithjr/bayesTPC">bayesTPC</a> <em>R</em> package is for Bayesian fitting of Thermal Performance Curves (TPCs) to trait responses. The package is built using the <a href="https://r-nimble.org/">nimble</a> language and machinery as the underlying engine for Markov Chain Monte Carlo (MCMC). Our main aims in releasing bayesTPC were to support the adoption of Bayesian approaches in thermal physiology, and to promote TPC fitting that adequately quantifies uncertainty. For a bit more information, take a look at the <a href="https://www.vectorbyte.org/blog/paper-introducing-bayestpc-is-out-in-methods-in-ecology-and-evolution">blog post about the paper</a> over at the <a href="https://www.vectorbyte.org">VectorByte Initiative</a>.</p>
 <ul>
-<li><a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12679" class="external" target="_blank">Boersch‐Supan, P.H., Ryan, S.J. and Johnson, L.R., 2017. “deBInfer: Bayesian inference for dynamical models of biological systems in R”. <em>Methods in Ecology and Evolution</em>, 8(4), pp.511-518.</a></li>
-<li><a href="https://cran.r-project.org/web/packages/deBInfer/index.html" class="external" target="_blank"><strong>deBInfer</strong> package on CRAN</a></li>
+<li>Paper: <a href="https://doi.org/10.1111/2041-210X.70004" class="external" target="_blank">Sorek, S., Smith, J. W. Jr., Huxley, P. J., &amp; Johnson, L. R. (2025). <code>bayesTPC</code>: Bayesian inference for thermal performance curves in <em>R</em>. Methods in Ecology and Evolution, 16, 687–697.</a></li>
+<li><a href="https://github.com/johnwilliamsmithjr/bayesTPC" class="external" target="_blank"><strong>bayesTPC</strong> git repository</a></li>
+</ul>
+</section>
+<section id="debinfer" class="level3">
+<h3 class="anchored" data-anchor-id="debinfer"><code>deBInfer</code></h3>
+<p>Differential equations (DEs) are commonly used to model the temporal evolution of biological systems, but statistical methods for comparing DE models to data and for parameter inference are relatively poorly developed. This is especially problematic in the context of biological systems where observations are often noisy and only a small number of time points may be available. We have developed <code>deBInfer</code>, an <em>R</em> package implementing a Bayesian framework for parameter inference in DEs. This approach offers a rigorous methodology for parameter inference as well as modeling the link between unobservable model states and parameters, and observable quantities.</p>
+<ul>
+<li>Paper: <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12679" class="external" target="_blank">Boersch‐Supan, P.H., Ryan, S.J. and Johnson, L.R., 2017. “deBInfer: Bayesian inference for dynamical models of biological systems in R”. <em>Methods in Ecology and Evolution</em>, 8(4), pp.511-518.</a></li>
+<li>Package: <a href="https://cran.r-project.org/web/packages/deBInfer/index.html" class="external" target="_blank"><strong>deBInfer</strong> package on CRAN</a></li>
 </ul>
 
 
