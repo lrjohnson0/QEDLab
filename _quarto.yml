@@ -48,6 +48,7 @@ format:
       - united
       - custom.scss
     toc: true
+    license: "CC BY-NC-SA"
 
 editor: source
 
