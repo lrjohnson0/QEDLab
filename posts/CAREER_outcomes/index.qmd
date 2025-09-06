@@ -1,0 +1,47 @@
+---
+title: "NSF CAREER Grant -- Final Outcomes"
+description: ""
+author: 
+  - name: 
+      given: Leah R.
+      family: Johnson
+    url: https://lrjohnson0.github.io/QEDLab/leahJ.html
+    affiliation: Virginia Tech
+date: "5 Sept 2025"
+draft: false
+categories:
+  - news
+  - grants
+citation: true
+license: "CC BY-NC-SA"
+---
+
+About a year ago, my NSF CAREER Award finally wrapped up, after multiple COVID-related no-cost extensions. One of the last tasks as part of any NSF grant is to write a short, plain English summary of what was accomplished on the project. These are intended to be more accessible to the general public than most other grant outputs. Putting these together can be pretty challenging (thanks for the help [Sara Richards](https://www.linkedin.com/in/sara-teemer-richards/)!). Although these summaries are automatically get posted on the NSF website, they can be a bit tricky to find. So, inspired by some other folks, I decided that I'd also post this summary here on the lab website. Note that the summary counts of talks, etc, was current as of when the summary was developed.
+
+<br>
+
+## Final Outcomes Summary
+
+**CAREER: Quantifying heterogeneity and uncertainty in the transmission of vector borne diseases with a Bayesian trait-based framework.** NSF DMS/DEB \#1750113. Award Amount:
+$700000. PI: Johnson. Project Period: 08/01/18-07/31/23 (no cost extension to 2024)
+
+<br>
+
+When an insect bites a human, plant, or another animal, it can pass on organisms called pathogens that may cause disease. Devastating illnesses like malaria, West Nile fever, and citrus greening disease are spread this way. These are called vector-borne diseases (VBDs) because they rely entirely on specific arthropods (called vectors) like mosquitoes, ticks, and flies to spread pathogens between hosts. Thus, temperature or anything else that affects what we call biological "traits" – such as a vector’s survival, development, reproduction, or biting behavior – can determine when, where, and how much these diseases spread.
+
+Pathogens, vectors, hosts, and the environment play a role in the spread of VBDs. Because these relationships can be difficult to study directly, scientists often use mathematical models as a tool to explore and test them. When models include data from experiments and observations, scientists can better understand how the environment might affect the spread of VBDs. This information can then be used to predict, and hopefully prevent, the spread of vector-borne diseases worldwide.
+ 
+The goal of this project was to improve our understanding of how traits that change with temperature—called thermal traits—impact the transmission of VBDs, while also improving the statistical tools we use to estimate uncertainty in these predictions. For example, we know that mosquitoes don’t lay eggs at extreme low and high temperatures but can lay many eggs at moderate temperatures. Mathematical models can use patterns for egg laying and many other traits to predict when and where VBD transmission might occur.
+ 
+To build our models, we gathered nearly 50,000 data points from published studies on the thermal traits of known vectors of diseases, including mosquitoes, aphids, midges, psyllids, and ticks. We carefully digitized the data in a standard format, making it easy to compare data across vectors. We also gathered information about thermal traits in other arthropods (such as beetles) that are not yet known to be vectors of pathogens but will serve as a useful comparison in the future. The cleaned data are being uploaded into the VecTraits database for public access.
+ 
+Using this new dataset, we created models (called "thermal performance curves" or TPCs) that show how vectors of diseases such as dengue, citrus greening, and bluetongue diseases respond to temperature. We developed an **R** package (`bayesTPC`) to make fitting and reproducing TPCs more straightforward for other scientists. Specifically, we used a Bayesian approach because it uses existing information to make predictions about things we don’t know, uses data more efficiently, and accounts for uncertainty. For instance, we used this approach to compare thermal traits of two related species of mosquitoes. We found that these mosquitoes respond to temperature differently, and as a result, might spread malaria at different times or in different places.
+ 
+The aggregated dataset forms the basis for many additional analyses. For example, the lifespan of a vector is important for estimating how long it can spread disease. We would expect that shorter-lived vectors will bite fewer hosts over their lifetime compared to longer-lived vectors. However, different approaches to estimating lifetime across temperature may yield different outcomes. We tested different methods for calculating lifespan using simulations and real data from the digitized dataset. This project is currently in the final draft stage and is the basis of a PhD dissertation chapter.
+ 
+We also use the dataset to investigate patterns in TPCs across many arthropods, not just vectors.  Again using a Bayesian approach, we use thermal traits in well-studied ticks and mosquitoes to make informed predictions about traits that may be present in poorly studied species (ongoing). We also explored TPC patterns across aphid species—important vectors of plant diseases, and confirmed that aphids of the same species from different latitudes have slightly different thermal traits. This results in slightly varied patterns of population growth across temperatures in different locations, which could impact biodiversity loss, food security, and disease risk. The manuscript exploring these consequences is in its final stages.
+
+This project has also helped support the development of new collaborations and experiments. Because humidity often changes alongside temperature, we are interested in how humidity could affect thermal traits of larval and adult mosquitos. A manuscript for the larval portion of the experiment has been submitted. Further analyses on the adult portion of the experiment and on general methods for modeling joint temperature and humidity traits are ongoing.
+ 
+This work has supported a variety of broader impacts. We trained 4 graduate students, 3 undergraduates, and 2 postdoctoral fellows—including women, non-binary individuals, people of color, and others from underrepresented groups. This work generated 2 conference presentations, 5 seminars, at least 14 peer-reviewed publications, and an R package. We also developed a pedagogy course in statistics and overhauled an additional course for undergraduate biology majors. Other outreach activities included participation in Skype-a-Scientist, and significant contributions to the VectorByte Initiative.
+
