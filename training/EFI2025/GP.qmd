@@ -73,7 +73,8 @@ library(gridExtra)
 ```
 
 ```{r, echo = FALSE, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width= 13, fig.height= 12, fig.align="center", warn.conflicts = FALSE}
-target <- read_csv('https://data.ecoforecast.org/neon4cast-targets/ticks/ticks-targets.csv.gz')
+
+target <- read_csv("https://sdsc.osn.xsede.org/bio230014-bucket01/challenges/targets/project_id=neon4cast/duration=P1W/ticks-targets.csv.gz", guess_max = 1e1)#'https://data.ecoforecast.org/neon4cast-targets/ticks/ticks-targets.csv.gz')
 
 v_color <- viridis(4, alpha = 1, begin = 0, end = 0.8, direction = 1, option = "C")
 
@@ -1091,7 +1092,7 @@ legend("topright", legend = c("nugget", "truth"), col = c("blue", "red"), lty = 
 ::: {.column width="50%"}
 
 ```{r, include = TRUE, cache=F, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.width=10, fig.height=6.8, fig.align="center", warn.conflicts = FALSE}
-target <- readr::read_csv("https://data.ecoforecast.org/neon4cast-targets/ticks/ticks-targets.csv.gz", guess_max = 1e6)
+target <- readr::read_csv("https://sdsc.osn.xsede.org/bio230014-bucket01/challenges/targets/project_id=neon4cast/duration=P1W/ticks-targets.csv.gz", guess_max = 1e1)#"https://data.ecoforecast.org/neon4cast-targets/ticks/ticks-targets.csv.gz", guess_max = 1e6)
 target <- target[, c(1, 2, 4)]
 colnames(target) <- c("datetime", "site_id", "observation")
 

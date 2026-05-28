@@ -9,6 +9,18 @@ output:
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
+# 2026
+
+```{r generateBibliography2026, results="asis", echo=FALSE, warning=FALSE, message=FALSE}
+require("knitcitations")
+cleanbib()
+options("citation_format" = "pandoc", 
+        "cite.style" = "authoryear", 
+        "max.names" = 10)
+read.bibtex(file = "publications/pubs2026.bib")
+```
+
+------------------------------------------------------------------------
 
 
 # 2025

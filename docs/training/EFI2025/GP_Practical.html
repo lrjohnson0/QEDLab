@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.33">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -13,6 +13,9 @@
 
 <title>Introduction to Gaussian Processes for Time Dependent Data (Practical) – QED Lab @ VT</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -63,7 +66,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -95,10 +97,10 @@ div.csl-indent {
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-3ff4d9e1d61fc6f7238a6b9e7798f05a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-70f9e4cb8b36a14d4324475bdef9a648.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -155,7 +157,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -347,33 +349,33 @@ window.Quarto = {
 <h1>Basics: Fitting a GP Model</h1>
 <p>Here’s our function from before: <span class="math display">Y(x) = 5 \sin(x)</span> Now, let’s learn how we actually use the library <code>laGP</code> to fit a GP and make predictions at new locations. Let’s begin by loading some libraries</p>
 <div class="cell" data-warn.conflicts="false">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mvtnorm)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mvtnorm)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(laGP)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hetGP)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now we create the data for our example. <code>(X, y)</code> is our given data,</p>
 <div class="cell" data-warn.conflicts="false">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># number of data points</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># number of data points</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">8</span> </span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Inputs - between 0 and 2pi</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="sc">*</span>pi, <span class="at">length=</span> n), <span class="at">ncol=</span><span class="dv">1</span>) </span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating the response using the formula</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="dv">5</span><span class="sc">*</span><span class="fu">sin</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="dv">5</span><span class="sc">*</span><span class="fu">sin</span>(X)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>First we use the <code>newGP</code> function to fit our GP. In this function, we need to pass in our inputs, outputs and any known parameters. If we do not know parameters, we can pass in some prior information we know about the parameters (which we will learn shortly) so that calculating the MLE is easier. Here, <code>X</code> indicates the input which must be a matrix, <code>Z</code> is used for response which is a vector, <code>d</code> is used for <span class="math inline">\theta</span> (length-scale), a scalar, which we assume to be known and equal to 1 and <code>g</code> is the nugget effect which is also a scalar. We pass in a very small value for numeric stability.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fitting GP </span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>gpi <span class="ot">&lt;-</span> <span class="fu">newGP</span>(<span class="at">X =</span> X, <span class="at">Z =</span> y, <span class="at">d =</span> <span class="dv">1</span>, <span class="at">g =</span> <span class="fu">sqrt</span>(.Machine<span class="sc">$</span>double.eps))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fitting GP </span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>gpi <span class="ot">&lt;-</span> <span class="fu">newGP</span>(<span class="at">X =</span> X, <span class="at">Z =</span> y, <span class="at">d =</span> <span class="dv">1</span>, <span class="at">g =</span> <span class="fu">sqrt</span>(.Machine<span class="sc">$</span>double.eps))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now we have fit the GP and if you print gpi it only outputs a number. This is because it assigns a number to the model as a reference but has everything stored within it. We needn’t get into the details of this in this tutorial. We can assume that our model is stored in <code>gpi</code> and all we see is the reference number.</p>
 <p>We will use <code>XX</code> as our predictive set i.e.&nbsp;we want to make predictions at those input locations. I have created this as a vector of 100 points between -0.5 and <span class="math inline">2 \pi</span> + 0.5. We are essentially using 8 data points to make predictions at 100 points. Let’s see how we do. We make use of the <code>predGP</code> function.</p>
 <p>We need to pass our GP object as <code>gpi</code> = gpi (in our case) and the predictive input locations <code>XX</code> = XX for this.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predictions</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predictions</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating a prediction set: sequence from -0.5 to 2*pi + 0.5 with 100 evenly spaced points</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>XX <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="fl">0.5</span>, <span class="dv">2</span><span class="sc">*</span>pi <span class="sc">+</span> <span class="fl">0.5</span>, <span class="at">length=</span> <span class="dv">100</span>), <span class="at">ncol=</span><span class="dv">1</span>)</span>
@@ -382,7 +384,7 @@ window.Quarto = {
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>yy <span class="ot">&lt;-</span> <span class="fu">predGP</span>(<span class="at">gpi =</span> gpi, <span class="at">XX =</span> XX)</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># This will tell us the results that we have stored.</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(yy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(yy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "mean"  "Sigma" "df"    "llik" </code></pre>
 </div>
@@ -390,16 +392,16 @@ window.Quarto = {
 <p><code>names(yy)</code> will tell us what is stored in <code>yy</code>. As we can see, we have the mean i.e.&nbsp;the mean predictions <span class="math inline">\mu</span> and, Sigma i.e.&nbsp;the covariance matrix <span class="math inline">\Sigma</span>.</p>
 <p>Now we can draw 100 random draws using the mean and variance matrix we obtained. We will also obtain the confidence bounds as shown below:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Since our posterior is a distribution, we take 100 samples from this.</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Since our posterior is a distribution, we take 100 samples from this.</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>YY <span class="ot">&lt;-</span> <span class="fu">rmvnorm</span> (<span class="dv">100</span>, yy<span class="sc">$</span>mean, yy<span class="sc">$</span>Sigma)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># We calculate the 95% bounds</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>q1 <span class="ot">&lt;-</span> yy<span class="sc">$</span>mean <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fl">0.025</span>, <span class="dv">0</span>, <span class="fu">sqrt</span>(<span class="fu">diag</span>(yy<span class="sc">$</span>Sigma))) </span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>q2 <span class="ot">&lt;-</span> yy<span class="sc">$</span>mean <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>, <span class="dv">0</span>, <span class="fu">sqrt</span>(<span class="fu">diag</span>(yy<span class="sc">$</span>Sigma))) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>q2 <span class="ot">&lt;-</span> yy<span class="sc">$</span>mean <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>, <span class="dv">0</span>, <span class="fu">sqrt</span>(<span class="fu">diag</span>(yy<span class="sc">$</span>Sigma))) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now, we will plot the mean prediction and the bounds along with each of our 100 draws.</p>
 <div class="cell page-columns page-full" data-layout-align="center" data-warn.conflicts="false">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Now for the plot</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Now for the plot</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">XX =</span> <span class="fu">rep</span>(XX, <span class="at">each =</span> <span class="dv">100</span>),</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">YY =</span> <span class="fu">as.vector</span>(YY),</span>
@@ -433,7 +435,7 @@ window.Quarto = {
 <span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>),</span>
 <span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>, <span class="at">color =</span> <span class="st">"white"</span>),</span>
 <span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"black"</span>)) <span class="sc">+</span></span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="st">"none"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display page-columns page-full">
 <div class="quarto-figure quarto-figure-center page-columns page-full">
 <figure class="figure page-columns page-full">
@@ -456,25 +458,26 @@ window.Quarto = {
 </ul>
 <p>Let’s start with loading all the libraries that we will need, load our data and understand what we have.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(laGP)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Pulling the data from the NEON data base. </span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>target <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"https://data.ecoforecast.org/neon4cast-targets/ticks/ticks-targets.csv.gz"</span>, <span class="at">guess_max =</span> <span class="fl">1e1</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizing the data</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(target)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>target <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"https://sdsc.osn.xsede.org/bio230014-bucket01/challenges/targets/project_id=neon4cast/duration=P1W/ticks-targets.csv.gz"</span>, <span class="at">guess_max =</span> <span class="fl">1e1</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                          <span class="co"># "https://data.ecoforecast.org/neon4cast-targets/ticks/ticks-targets.csv.gz"</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizing the data</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(target)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 5
-  datetime   site_id variable             observation iso_week
-  &lt;date&gt;     &lt;chr&gt;   &lt;chr&gt;                      &lt;dbl&gt; &lt;chr&gt;   
-1 2015-04-20 BLAN    amblyomma_americanum        0    2015-W17
-2 2015-05-11 BLAN    amblyomma_americanum        9.82 2015-W20
-3 2015-06-01 BLAN    amblyomma_americanum       10    2015-W23
-4 2015-06-08 BLAN    amblyomma_americanum       19.4  2015-W24
-5 2015-06-22 BLAN    amblyomma_americanum        3.14 2015-W26
-6 2015-07-13 BLAN    amblyomma_americanum        3.66 2015-W29</code></pre>
+<pre><code># A tibble: 6 × 6
+  project_id site_id datetime            duration variable           observation
+  &lt;chr&gt;      &lt;chr&gt;   &lt;dttm&gt;              &lt;chr&gt;    &lt;chr&gt;                    &lt;dbl&gt;
+1 neon4cast  BLAN    2015-04-20 00:00:00 P1W      amblyomma_america…        0   
+2 neon4cast  BLAN    2015-05-11 00:00:00 P1W      amblyomma_america…        9.82
+3 neon4cast  BLAN    2015-06-01 00:00:00 P1W      amblyomma_america…       10   
+4 neon4cast  BLAN    2015-06-08 00:00:00 P1W      amblyomma_america…       19.4 
+5 neon4cast  BLAN    2015-06-22 00:00:00 P1W      amblyomma_america…        3.14
+6 neon4cast  BLAN    2015-07-13 00:00:00 P1W      amblyomma_america…        3.66</code></pre>
 </div>
 </div>
 </section>
@@ -494,7 +497,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <p>We pass in (<code>response</code> + 1) into this function to ensure we don’t take a log of 0. We will adjust this in our back transform.</p>
 <p>Let’s write a function for this, as well as the inverse of the transform.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># transforms y</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># transforms y</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">log</span>(x <span class="sc">+</span> <span class="dv">1</span>)</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(y)</span>
@@ -504,7 +507,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>fi <span class="ot">&lt;-</span> <span class="cf">function</span>(y) {</span>
 <span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">exp</span>(y) <span class="sc">-</span> <span class="dv">1</span></span>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(x)</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="predictors" class="level2 page-columns page-full">
@@ -517,7 +520,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <p><span class="math inline">X_1</span> Iso-week: This is the iso-week number</p>
 <p>Let’s convert the <code>iso-week</code> from our <code>target</code> dataset as a numeric i.e.&nbsp;a number. Here is a function to do the same.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This function tells us the iso-week number given the date</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This function tells us the iso-week number given the date</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>fx.iso_week <span class="ot">&lt;-</span> <span class="cf">function</span>(datetime){</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Gives ISO-week in the format yyyy-w## and we extract the ##</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  x1 <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(stringr<span class="sc">::</span><span class="fu">str_sub</span>(ISOweek<span class="sc">::</span><span class="fu">ISOweek</span>(datetime), <span class="dv">7</span>, <span class="dv">8</span>)) <span class="co"># find iso week #</span></span>
@@ -525,7 +528,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>target<span class="sc">$</span>week <span class="ot">&lt;-</span> <span class="fu">fx.iso_week</span>(target<span class="sc">$</span>datetime)</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(target)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(target)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 6
   datetime   site_id variable             observation iso_week  week
@@ -545,7 +548,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <p>Usually, a Sin wave for a year would have the periodicity of 53 to indicate 53 weeks. Why have we chosen 106 as our period? And we do we square it?</p>
 <p>Let’s use a visual to understand that.</p>
 <div class="cell page-columns page-full" data-layout-align="center" data-warn.conflicts="false">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">106</span>)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">106</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sin_53 <span class="ot">&lt;-</span> <span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span>x<span class="sc">/</span><span class="dv">53</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>sin_106 <span class="ot">&lt;-</span> (<span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span>x<span class="sc">/</span><span class="dv">106</span>))</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>sin_106_2 <span class="ot">&lt;-</span> (<span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span>x<span class="sc">/</span><span class="dv">106</span>))<span class="sc">^</span><span class="dv">2</span></span>
@@ -559,7 +562,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
 <span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x, sin_106_2, <span class="at">col =</span> <span class="dv">4</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="at">ylab =</span> <span class="st">"sin wave"</span>, </span>
 <span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(sin<span class="sc">^</span><span class="dv">2</span>,  <span class="st">" "</span>, (<span class="fu">frac</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> X[<span class="dv">1</span>], <span class="dv">106</span>)))))</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display page-columns page-full">
 <div class="quarto-figure quarto-figure-center page-columns page-full">
 <figure class="figure page-columns page-full">
@@ -575,13 +578,13 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <li><p>We also want the next year to repeat the same pattern i.e.&nbsp;we want to restrict it to [0, 1] interval. Thus, we square the sin wave.</p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>fx.sin <span class="ot">&lt;-</span> <span class="cf">function</span>(datetime, <span class="at">f1 =</span> fx.iso_week){</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>fx.sin <span class="ot">&lt;-</span> <span class="cf">function</span>(datetime, <span class="at">f1 =</span> fx.iso_week){</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># identify iso week#</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">f1</span>(datetime) </span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># calculate sin value for that week</span></span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  x2 <span class="ot">&lt;-</span> (<span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span>x<span class="sc">/</span><span class="dv">106</span>))<span class="sc">^</span><span class="dv">2</span> </span>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(x2)</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>For a GP, it’s also useful to ensure that all our X’s are between 0 and 1. Usually this is done by using the following method</p>
 <p><span class="math inline">X_i^* = \frac{X_i - \min(X)}{\max(X) - \min(X) }</span> where <span class="math inline">X = (X_1, X_2 ...X_n)</span></p>
@@ -592,7 +595,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <h2 class="anchored" data-anchor-id="model-fitting">Model Fitting</h2>
 <p>Now, let’s start with modelling. We will start with one random location out of the 9 locations.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Choose a random site number: Anything between 1-9.</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Choose a random site number: Anything between 1-9.</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>site_number <span class="ot">&lt;-</span> <span class="dv">6</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtaining site name</span></span>
@@ -600,7 +603,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Subsetting all the data at that location</span></span>
 <span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">subset</span>(target, target<span class="sc">$</span>site_id <span class="sc">==</span> site_names[site_number])</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 6
   datetime   site_id variable             observation iso_week  week
@@ -615,22 +618,22 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 </div>
 <p>We will also select only those columns that we are interested in i.e.&nbsp;<code>datetime</code> and <code>obervation</code>. We don’t need site since we are only using one of them.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracting only the datetime and obs columns</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df[, <span class="fu">c</span>(<span class="st">"datetime"</span>, <span class="st">"observation"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracting only the datetime and obs columns</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df[, <span class="fu">c</span>(<span class="st">"datetime"</span>, <span class="st">"observation"</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>We will use one site at first and fit a GP and make predictions. For this we first need to divide our data into a training set and a testing set. Since we have time series, we want to divide the data sequentially, i.e.&nbsp;we pick a date and everything before the date is our training set and after is our testing set where we check how well our model performs. We choose the date <code>2020-12-31</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Selecting a date before which we consider everything as training data and after this is testing data.</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Selecting a date before which we consider everything as training data and after this is testing data.</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>cutoff <span class="ot">=</span> <span class="fu">as.Date</span>(<span class="st">'2022-12-31'</span>)</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>df_train <span class="ot">&lt;-</span> <span class="fu">subset</span>(df, df<span class="sc">$</span>datetime <span class="sc">&lt;=</span> cutoff)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> <span class="fu">subset</span>(df, df<span class="sc">$</span>datetime <span class="sc">&gt;</span> cutoff)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> <span class="fu">subset</span>(df, df<span class="sc">$</span>datetime <span class="sc">&gt;</span> cutoff)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="gp-model" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="gp-model">GP Model</h2>
 <p>Now we will setup our X’s. We already have the functions to do this and can simply pass in the datetime. We then combine <span class="math inline">X_1</span> and <span class="math inline">X_2</span> to create out input matrix <span class="math inline">X</span>. Remember, everything is ordered as in our dataset.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Setting up iso-week and sin wave predictors by calling the functions</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Setting up iso-week and sin wave predictors by calling the functions</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>X1 <span class="ot">&lt;-</span> <span class="fu">fx.iso_week</span>(df_train<span class="sc">$</span>datetime) <span class="co"># range is 1-53</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>X2 <span class="ot">&lt;-</span> <span class="fu">fx.sin</span>(df_train<span class="sc">$</span>datetime) <span class="co"># range is 0 to 1</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -639,7 +642,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># We combine columns centered X1 and X2, into a matrix as our input space</span></span>
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">cbind.data.frame</span>(X1c, X2))</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(X)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>           X1c        X2
 [1,] 0.4528302 0.9782005
@@ -652,33 +655,33 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 </div>
 <p>Next step is to tranform the response to ensure it is normal.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract y: observation from our training model. </span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract y: observation from our training model. </span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>y_obs <span class="ot">&lt;-</span> df_train<span class="sc">$</span>observation</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Transform the response</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">f</span>(y_obs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">f</span>(y_obs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now, we can use the <code>laGP</code> library to fit a GP. First, we specify priors using <code>darg</code> and <code>garg</code>. We will specify a minimum and maximum for our arguments. We need to pass the input space for <code>darg</code> and the output vector for <code>garg</code>. You can look into the functions using <code>?function</code> in R. We set the minimum to a very small value rather than 0 to ensure numeric stability.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A very small value for stability</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A very small value for stability</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>eps <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(.Machine<span class="sc">$</span>double.eps) </span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Priors for theta and g. </span></span>
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">darg</span>(<span class="fu">list</span>(<span class="at">mle=</span><span class="cn">TRUE</span>, <span class="at">min =</span>eps, <span class="at">max=</span><span class="dv">5</span>), X)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">garg</span>(<span class="fu">list</span>(<span class="at">mle=</span><span class="cn">TRUE</span>, <span class="at">min =</span> eps, <span class="at">max =</span> <span class="dv">1</span>), y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">garg</span>(<span class="fu">list</span>(<span class="at">mle=</span><span class="cn">TRUE</span>, <span class="at">min =</span> eps, <span class="at">max =</span> <span class="dv">1</span>), y)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now, to fit the GP, we use <code>newGPsep</code>. We pass the input matrix and the response vector with some values of the parameters. Then, we use the <code>jmleGPsep</code> function to jointly estimate <span class="math inline">\theta</span> and <span class="math inline">g</span> using MLE method. <code>dK</code> allows the GP object to store derivative information which is needed for MLE calculations. <code>newGPsep</code> will fit a separable GP as opposed to <code>newGP</code> which would fit an isotropic GP.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fitting a GP with our data, and some starting values for theta and g</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fitting a GP with our data, and some starting values for theta and g</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>gpi <span class="ot">&lt;-</span> <span class="fu">newGPsep</span>(X, y, <span class="at">d =</span> <span class="fl">0.1</span>, <span class="at">g =</span> <span class="dv">1</span>, <span class="at">dK =</span> T)</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Jointly infer MLE for all parameters</span></span>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>mle <span class="ot">&lt;-</span> <span class="fu">jmleGPsep</span>(gpi, <span class="at">drange =</span> <span class="fu">c</span>(d<span class="sc">$</span>min, d<span class="sc">$</span>max), <span class="at">grange =</span> <span class="fu">c</span>(g<span class="sc">$</span>min, g<span class="sc">$</span>max), </span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">dab =</span> d<span class="sc">$</span>ab, <span class="at">gab=</span>  g<span class="sc">$</span>ab)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">dab =</span> d<span class="sc">$</span>ab, <span class="at">gab=</span>  g<span class="sc">$</span>ab)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now, we will create a grid from the first week in our dataset to 1 year into the future, and predict on the entire time series. We use <code>predGPsep</code> to make predictions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a grid from start date in our data set to one year in future (so we forecast for next season)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a grid from start date in our data set to one year in future (so we forecast for next season)</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>startdate <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">min</span>(df<span class="sc">$</span>datetime))<span class="co"># identify start week</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>grid_datetime <span class="ot">&lt;-</span> <span class="fu">seq.Date</span>(startdate, <span class="fu">Sys.Date</span>() <span class="sc">+</span> <span class="dv">365</span>, <span class="at">by =</span> <span class="dv">7</span>) <span class="co"># create sequence from </span></span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -693,18 +696,18 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>XXt <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">cbind.data.frame</span>(XXt1c, XXt2))</span>
 <span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Make predictions using predGP with the gp object and the predictive set</span></span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>ppt <span class="ot">&lt;-</span> <span class="fu">predGPsep</span>(gpi, XXt) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>ppt <span class="ot">&lt;-</span> <span class="fu">predGPsep</span>(gpi, XXt) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Storing the mean and calculating quantiles.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Now we store the mean as our predicted response i.e. density along with quantiles</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Now we store the mean as our predicted response i.e. density along with quantiles</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>yyt <span class="ot">&lt;-</span> ppt<span class="sc">$</span>mean</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>q1t <span class="ot">&lt;-</span> ppt<span class="sc">$</span>mean <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fl">0.025</span>,<span class="dv">0</span>,<span class="fu">sqrt</span>(<span class="fu">diag</span>(ppt<span class="sc">$</span>Sigma))) <span class="co">#lower bound</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>q2t <span class="ot">&lt;-</span> ppt<span class="sc">$</span>mean <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>,<span class="dv">0</span>,<span class="fu">sqrt</span>(<span class="fu">diag</span>(ppt<span class="sc">$</span>Sigma))) <span class="co"># upper bound</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>q2t <span class="ot">&lt;-</span> ppt<span class="sc">$</span>mean <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>,<span class="dv">0</span>,<span class="fu">sqrt</span>(<span class="fu">diag</span>(ppt<span class="sc">$</span>Sigma))) <span class="co"># upper bound</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now we can plot our data and predictions and see how well our model performed. We need to back transform our predictions to the original scale.</p>
 <div class="cell page-columns page-full" data-layout-align="center" data-warn.conflicts="false">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Back transform our data to original</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Back transform our data to original</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>gp_yy <span class="ot">&lt;-</span> <span class="fu">fi</span>(yyt)</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>gp_q1 <span class="ot">&lt;-</span> <span class="fu">fi</span>(q1t)</span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>gp_q2 <span class="ot">&lt;-</span> <span class="fu">fi</span>(q2t)</span>
@@ -725,7 +728,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Add the predicted response and the quantiles</span></span>
 <span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(grid_datetime, gp_yy, <span class="at">col =</span> <span class="dv">4</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
 <span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(grid_datetime, gp_q1, <span class="at">col =</span> <span class="dv">4</span>, <span class="at">lwd =</span> <span class="fl">1.2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(grid_datetime, gp_q2, <span class="at">col =</span> <span class="dv">4</span>, <span class="at">lwd =</span> <span class="fl">1.2</span>, <span class="at">lty =</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(grid_datetime, gp_q2, <span class="at">col =</span> <span class="dv">4</span>, <span class="at">lwd =</span> <span class="fl">1.2</span>, <span class="at">lty =</span><span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display page-columns page-full">
 <div class="quarto-figure quarto-figure-center page-columns page-full">
 <figure class="figure page-columns page-full">
@@ -736,7 +739,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 </div>
 <p>That looks pretty good? We can also look at the RMSE to see how the model performs. It is better o do this on the transformed scale. We will use <code>yyt</code> for this. We need to find those predictions which correspond to the datetime in our testing dataset <code>df_test</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtain true observed values for testing set</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtain true observed values for testing set</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>yt_true <span class="ot">&lt;-</span> <span class="fu">f</span>(df_test<span class="sc">$</span>observation)</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># FInd corresponding predictions from our model in the grid we predicted on</span></span>
@@ -744,7 +747,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate RMSE</span></span>
 <span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>rmse <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((yt_true <span class="sc">-</span> yt_pred)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>rmse</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>rmse</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.870971</code></pre>
 </div>
@@ -755,7 +758,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <p>Next, we can attempt a hetGP. We are now interested in fitting a vector of nuggets rather than a single value.</p>
 <p>Let’s use the same data we have to fit a hetGP. We already have our data <code>(X, y)</code> as well as our prediction set <code>XXt</code>. We use the <code>mleHetGP</code> command to fit a GP and pass in our data. The default covariance structure is the Squared Exponential structure. We use the <code>predict</code> function in base R and pass the hetGP object i.e.&nbsp;<code>het_gpi</code> to make predictions on our set <code>XXt</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create predictors</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create predictors</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>X1 <span class="ot">&lt;-</span> <span class="fu">fx.iso_week</span>(df_train<span class="sc">$</span>datetime)</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>X2 <span class="ot">&lt;-</span> <span class="fu">fx.sin</span>(df_train<span class="sc">$</span>datetime)</span>
 <span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -779,11 +782,11 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>het_gpi <span class="ot">&lt;-</span> hetGP<span class="sc">::</span><span class="fu">mleHetGP</span>(<span class="at">X =</span> X, <span class="at">Z =</span> y)</span>
 <span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Predictions using the base R predict command with a hetGP object and new locationss</span></span>
-<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>het_ppt <span class="ot">&lt;-</span> <span class="fu">predict</span>(het_gpi, XXt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>het_ppt <span class="ot">&lt;-</span> <span class="fu">predict</span>(het_gpi, XXt)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now we obtain the mean and the confidence bounds as well as transform the data to the original scale.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean density for predictive locations and Confidence bounds</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean density for predictive locations and Confidence bounds</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>het_yyt <span class="ot">&lt;-</span> het_ppt<span class="sc">$</span>mean</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>het_q1t <span class="ot">&lt;-</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>, het_ppt<span class="sc">$</span>mean, <span class="fu">sqrt</span>(het_ppt<span class="sc">$</span>sd2 <span class="sc">+</span> het_ppt<span class="sc">$</span>nugs))</span>
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>het_q2t <span class="ot">&lt;-</span> <span class="fu">qnorm</span>(<span class="fl">0.025</span>, het_ppt<span class="sc">$</span>mean, <span class="fu">sqrt</span>(het_ppt<span class="sc">$</span>sd2 <span class="sc">+</span> het_ppt<span class="sc">$</span>nugs)) </span>
@@ -791,11 +794,11 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Back transforming to original scale</span></span>
 <span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>het_yy <span class="ot">&lt;-</span> <span class="fu">fi</span>(het_yyt)</span>
 <span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>het_q1 <span class="ot">&lt;-</span> <span class="fu">fi</span>(het_q1t)</span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>het_q2 <span class="ot">&lt;-</span> <span class="fu">fi</span>(het_q2t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>het_q2 <span class="ot">&lt;-</span> <span class="fu">fi</span>(het_q2t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>We can now plot the results similar to before. [Uncomment the code lines to see how a GP vs a HetGP fits the data]</p>
 <div class="cell page-columns page-full" data-layout-align="center" data-warn.conflicts="false">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Original data</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Original data</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">as.Date</span>(df<span class="sc">$</span>datetime), df<span class="sc">$</span>observation,</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">main =</span> <span class="fu">paste</span>(site_names[site_number]), <span class="at">col =</span> <span class="st">"black"</span>,</span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"Dates"</span> , <span class="at">ylab =</span> <span class="st">"Abundance"</span>,</span>
@@ -815,7 +818,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Train Y"</span>,<span class="st">"Test Y"</span>, <span class="st">"HetGP preds"</span>),</span>
 <span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, <span class="dv">1</span>),</span>
-<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">pch =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">19</span>, <span class="cn">NA</span>), <span class="at">cex =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">pch =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">19</span>, <span class="cn">NA</span>), <span class="at">cex =</span> <span class="fl">0.5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display page-columns page-full">
 <div class="quarto-figure quarto-figure-center page-columns page-full">
 <figure class="figure page-columns page-full">
@@ -827,20 +830,20 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <p>The mean predictions of a GP are similar to that of a hetGP; But the confidence bounds are different. A hetGP produces sligtly tighter bounds.</p>
 <p>We can also compare the RMSE’s using the predictions of the hetGP model.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>yt_true <span class="ot">&lt;-</span> <span class="fu">f</span>(df_test<span class="sc">$</span>observation) <span class="co"># Original data</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>yt_true <span class="ot">&lt;-</span> <span class="fu">f</span>(df_test<span class="sc">$</span>observation) <span class="co"># Original data</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>het_yt_pred <span class="ot">&lt;-</span> het_yyt[<span class="fu">which</span>(grid_datetime  <span class="sc">%in%</span> df_test<span class="sc">$</span>datetime)] <span class="co"># model preds</span></span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate rmse for hetGP model</span></span>
 <span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>rmse_het <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((yt_true <span class="sc">-</span> het_yt_pred)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>rmse_het</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>rmse_het</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9107167</code></pre>
+<pre><code>[1] 0.8635241</code></pre>
 </div>
 </div>
 <p>Now that we have learnt how to fit a GP and a hetGP, it’s time for a challenge.</p>
 <p>Try a hetGP on this example.</p>
 <div class="cell page-columns page-full">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Your turn</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Your turn</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> mcycle<span class="sc">$</span>time</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> mcycle<span class="sc">$</span>accel</span>
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -848,7 +851,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>XX <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">301</span>, <span class="at">length=</span> <span class="dv">200</span>), <span class="at">ncol=</span><span class="dv">1</span>)</span>
 <span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Data visualization</span></span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(X, y, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">150</span>, <span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(X, y, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">150</span>, <span class="dv">100</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display page-columns page-full">
 <div class="page-columns page-full">
 <figure class="figure page-columns page-full">
@@ -856,7 +859,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add code to fit a hetGP model and visualise it as above</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add code to fit a hetGP model and visualise it as above</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
@@ -875,7 +878,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <h4 class="anchored" data-anchor-id="build-altitude-predictor-for-the-testing-set-advanced.">Build altitude predictor for the testing set (<em>Advanced</em>).</h4>
 <p>Here is a snippet of the function to build the predictor.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>site_data <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="fu">paste0</span>(<span class="st">"https://raw.githubusercontent.com/eco4cast/neon4cast-targets/"</span>,<span class="st">"main/NEON_Field_Site_Metadata_20220412.csv"</span>)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(ticks <span class="sc">==</span> <span class="dv">1</span>)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>site_data <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="fu">paste0</span>(<span class="st">"https://raw.githubusercontent.com/eco4cast/neon4cast-targets/"</span>,<span class="st">"main/NEON_Field_Site_Metadata_20220412.csv"</span>)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(ticks <span class="sc">==</span> <span class="dv">1</span>)</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>site_data <span class="ot">&lt;-</span> site_data <span class="sc">|&gt;</span> dplyr<span class="sc">:::</span><span class="fu">select</span>(field_site_id, field_mean_elevation_m)</span>
 <span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(site_data) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"site_id"</span>, <span class="st">"altitude"</span>)</span>
@@ -889,7 +892,7 @@ f(y) &amp; = \log (y + 1) \\[2pt]
 <span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df<span class="sc">$</span>alt)</span>
 <span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> target[, <span class="fu">c</span>(<span class="st">"datetime"</span>, <span class="st">"site_id"</span>, <span class="st">"observation"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> target[, <span class="fu">c</span>(<span class="st">"datetime"</span>, <span class="st">"site_id"</span>, <span class="st">"observation"</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Hints: Follow the layout</p>
 <pre><code># build training set for full dataset.
@@ -926,7 +929,7 @@ for(i in 1:__){
 </section>
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-binois2021hetgp" class="csl-entry" role="listitem">
 Binois, Mickaël, and Robert B Gramacy. 2021. <span>“Hetgp: Heteroskedastic Gaussian Process Modeling and Sequential Design in r.”</span> <em>Journal of Statistical Software</em> 98: 1–44.
 </div>
@@ -944,7 +947,7 @@ Gramacy, Robert B. 2016. <span>“<span class="nocase">laGP: Large-Scale Spatial
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-vijay_patil2025" class="csl-entry quarto-appendix-citeas" role="listitem">
 Vijay Patil, Parul, Leah R. Johnson, and Robert B. Gramacy. 2025.
 <span>“Introduction to Gaussian Processes for Time Dependent Data
-(Practical).”</span> May 19, 2025.
+(Practical).”</span> May 19.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -997,13 +1000,14 @@ Vijay Patil, Parul, Leah R. Johnson, and Robert B. Gramacy. 2025.
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.33">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>Training Materials – QED Lab @ VT</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -36,10 +39,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-3ff4d9e1d61fc6f7238a6b9e7798f05a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-70f9e4cb8b36a14d4324475bdef9a648.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -167,6 +170,8 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   <li><a href="#externally-housed-materials" id="toc-externally-housed-materials" class="nav-link" data-scroll-target="#externally-housed-materials">Externally Housed Materials</a>
   <ul class="collapse">
+  <li><a href="#vectorbyte-2026-the-vecdyn-and-vectraits-databases" id="toc-vectorbyte-2026-the-vecdyn-and-vectraits-databases" class="nav-link" data-scroll-target="#vectorbyte-2026-the-vecdyn-and-vectraits-databases">VectorByte 2026: The VecDyn and VecTraits Databases</a></li>
+  <li><a href="#vectorbyte-2025-temporal-data-analysis" id="toc-vectorbyte-2025-temporal-data-analysis" class="nav-link" data-scroll-target="#vectorbyte-2025-temporal-data-analysis">VectorByte 2025: Temporal Data Analysis</a></li>
   <li><a href="#vectorbyte-2024-temporal-data-analysis" id="toc-vectorbyte-2024-temporal-data-analysis" class="nav-link" data-scroll-target="#vectorbyte-2024-temporal-data-analysis">VectorByte 2024: Temporal Data Analysis</a></li>
   <li><a href="#eeid-2024-bayesian-analysis-of-trait-data" id="toc-eeid-2024-bayesian-analysis-of-trait-data" class="nav-link" data-scroll-target="#eeid-2024-bayesian-analysis-of-trait-data">EEID 2024: Bayesian Analysis of Trait Data</a></li>
   <li><a href="#vectorbyte-2023-bayesian-analysis-of-trait-data" id="toc-vectorbyte-2023-bayesian-analysis-of-trait-data" class="nav-link" data-scroll-target="#vectorbyte-2023-bayesian-analysis-of-trait-data">VectorByte 2023: Bayesian Analysis of Trait Data</a></li>
@@ -207,6 +212,12 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="externally-housed-materials" class="level2">
 <h2 class="anchored" data-anchor-id="externally-housed-materials">Externally Housed Materials</h2>
+<section id="vectorbyte-2026-the-vecdyn-and-vectraits-databases" class="level3">
+<h3 class="anchored" data-anchor-id="vectorbyte-2026-the-vecdyn-and-vectraits-databases"><a href="https://vectorbyteorg.github.io/vectorbyte-training2026/">VectorByte 2026: The VecDyn and VecTraits Databases</a></h3>
+</section>
+<section id="vectorbyte-2025-temporal-data-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="vectorbyte-2025-temporal-data-analysis"><a href="https://vectorbyteorg.github.io/vectorbyte-training2025/">VectorByte 2025: Temporal Data Analysis</a></h3>
+</section>
 <section id="vectorbyte-2024-temporal-data-analysis" class="level3">
 <h3 class="anchored" data-anchor-id="vectorbyte-2024-temporal-data-analysis"><a href="https://vectorbyteorg.github.io/vectorbyte-training2024/">VectorByte 2024: Temporal Data Analysis</a></h3>
 </section>
@@ -286,13 +297,14 @@ var sc_security="092cf49e";
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

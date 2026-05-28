@@ -154,7 +154,8 @@ library(laGP)
 library(ggplot2)
 
 # Pulling the data from the NEON data base. 
-target <- readr::read_csv("https://data.ecoforecast.org/neon4cast-targets/ticks/ticks-targets.csv.gz", guess_max = 1e1)
+target <- readr::read_csv("https://sdsc.osn.xsede.org/bio230014-bucket01/challenges/targets/project_id=neon4cast/duration=P1W/ticks-targets.csv.gz", guess_max = 1e1)
+                          # "https://data.ecoforecast.org/neon4cast-targets/ticks/ticks-targets.csv.gz"
 
 # Visualizing the data
 head(target)
